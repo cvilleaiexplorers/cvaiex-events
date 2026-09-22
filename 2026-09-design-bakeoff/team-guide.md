@@ -42,15 +42,21 @@ Use a general coding agent in a local folder, and give it a *design skill*: a se
 |---|---|
 | Claude Code, Codex CLI, Cursor, Gemini CLI, Copilot, etc. | **Impeccable** (impeccable.style, `github.com/pbakaus/impeccable`). A design vocabulary for agents, installed with `npx impeccable install`. Useful commands: `/impeccable init` (records audience, purpose and voice), `/impeccable shape` (plans the UX before any code), `/impeccable critique`, `/impeccable typeset`, `/impeccable colorize`, `/impeccable animate`, `/impeccable polish`. `/impeccable live` lets you try variants of an element in the browser. |
 | Claude Code | Anthropic's **frontend-design** plugin: `/plugin install frontend-design@claude-plugins-official`. Pushes the agent toward bold, specific type, color and motion choices. |
+| OpenAI Codex (CLI, IDE extension, or the Codex app) | OpenAI's **frontend-skill**: `npx skills add https://github.com/openai/skills --skill frontend-skill`. It favors full-bleed heroes, few cards, at most two typefaces and one accent color, and has Codex write a "visual thesis" before it builds. Pair it with a **Playwright** skill so Codex can open the page in a browser, check it at different screen widths and fix what it sees. |
+| OpenAI Codex | The **Product Design** plugin (one of OpenAI's June 2026 role plugins). Made for exploring product directions, prototyping from a live URL and turning static screenshots into interactive prototypes. Good for the "try several concepts" step. |
 | Any agent | **Taste Skill** (tasteskill.dev). Another "anti-slop" skill with opinions on type scale, spacing and density. |
 
 **Good for:** teams who want full control and code they can actually read.
-**Interesting experiment:** give two teams the same agent, one with a design skill and one without, and compare.
+**Interesting experiments:**
+- Give two teams the same agent, one with a design skill and one without, and compare.
+- Pit **Claude Code + frontend-design** against **Codex + frontend-skill**: same content, same time, different vendor.
 
 ### Lane D: Reference-driven (image to code)
 Start from pictures instead of words. Build a mood board of 3–5 sites, posters or photos you love, then give the screenshots to any tool that accepts images (Claude, Stitch, v0, Lovable, a coding agent). Ask it to capture the *feel* of the references without copying any of them.
 
 **Good for:** teams who have a look in mind but can't put it into words.
+**OpenAI option:** use **ChatGPT Images 2.0** (`gpt-image-2`, available on every ChatGPT plan and inside Codex) to generate full-page mockups as images. It handles text and UI layouts far better than earlier image models. Pick the best mockup, then give it to Codex or any other agent: "Build this as a responsive site using the attached content."
+
 **Variation:** use an image model to create original hero art or textures first (a Blue Ridge ridgeline, a Charlottesville map, abstract "exploration" art), then design the site around that art.
 
 ### Lane E: Wildcard constraints
@@ -104,6 +110,10 @@ Pick any tool, but add a constraint that forces a real point of view:
 **Turn concepts into quick mockups you can compare:**
 
 > Build the hero and one content section for each of the 4 directions as separate static HTML pages (or one page with tabs) so we can compare them side by side.
+
+**Plan before building.** This comes from OpenAI's frontend guidance and works with any tool:
+
+> Before writing code, give me: (1) a **visual thesis**: the mood, materials and energy in one sentence; (2) a **content plan**: the order of hero, supporting sections, details and call to action; (3) an **interaction thesis**: 2–3 motion or interaction ideas.
 
 **Push past the first answer:**
 - "That's too safe. Make direction 2 twice as bold."
