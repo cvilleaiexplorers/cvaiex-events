@@ -41,8 +41,9 @@ Use a general coding agent in a local folder, and give it a *design skill*: a se
 | Agent | Design skill to add |
 |---|---|
 | Claude Code, Codex CLI, Cursor, Gemini CLI, Copilot, etc. | **Impeccable** (impeccable.style, `github.com/pbakaus/impeccable`). A design vocabulary for agents, installed with `npx impeccable install`. Useful commands: `/impeccable init` (records audience, purpose and voice), `/impeccable shape` (plans the UX before any code), `/impeccable critique`, `/impeccable typeset`, `/impeccable colorize`, `/impeccable animate`, `/impeccable polish`. `/impeccable live` lets you try variants of an element in the browser. |
+| Claude Code (CLI or desktop app) | The **`/design`** skill (research preview, August 2026). It brings Claude Design's artboard workflow into Claude Code: run `/design a few options for the Cville AI Explorers homepage` and it publishes a canvas of editable mockups. Pick one, tweak it, then tell Claude to build it. Needs Claude Code v2.1.233+ signed in with a Pro, Max, Team or Enterprise plan. The easiest way to get the "3+ concepts" step in Lane C. |
 | Claude Code | Anthropic's **frontend-design** plugin: `/plugin install frontend-design@claude-plugins-official`. Pushes the agent toward bold, specific type, color and motion choices. |
-| OpenAI Codex (CLI, IDE extension, or the Codex app) | OpenAI's **frontend-skill**: `npx skills add https://github.com/openai/skills --skill frontend-skill`. It favors full-bleed heroes, few cards, at most two typefaces and one accent color, and has Codex write a "visual thesis" before it builds. Pair it with a **Playwright** skill so Codex can open the page in a browser, check it at different screen widths and fix what it sees. |
+| OpenAI Codex (CLI, IDE extension, or the Codex app) | OpenAI's **frontend-skill**: `npx skills add https://github.com/openai/skills --skill frontend-skill`. It favors full-bleed heroes, few cards, at most two typefaces and one accent color, and has Codex write a "visual thesis" before it builds. Use the **Codex app's built-in browser** so Codex can open your local page, click through it, take screenshots and fix what it sees. You can also comment directly on the rendered page. |
 | OpenAI Codex | The **Product Design** plugin (one of OpenAI's June 2026 role plugins). Made for exploring product directions, prototyping from a live URL and turning static screenshots into interactive prototypes. Good for the "try several concepts" step. |
 | Any agent | **Taste Skill** (tasteskill.dev). Another "anti-slop" skill with opinions on type scale, spacing and density. |
 
@@ -75,6 +76,8 @@ Pick any tool, but add a constraint that forces a real point of view:
 3. **Converge (10 min).** Pick one, or combine the best parts of two. Write down *why*.
 4. **Build (bulk of the time).** Make every piece of content from `site-content.md` work, including the "TBA" meetup state and the sponsor details.
 5. **Critique and polish (last 20 min).** Screenshot it, ask the AI to critique it harshly, fix the top 3 issues, and check it at phone width.
+
+**Let the agent see its own work.** The Claude desktop app (Browser pane, Cmd/Ctrl+Shift+B) and the Codex app both have a built-in browser. Ask the agent to open your page, view it at phone and desktop widths, and fix what looks wrong, instead of relying on you to describe it. On a CLI-only setup, a Playwright tool or skill does the same job.
 
 ---
 
