@@ -1,8 +1,10 @@
-# Redesign Hackathon: Team Guide
+# Design Hackathon: Team Guide
 
 **The challenge:** Redesign the Cville AI Explorers website from scratch. Start only from `site-content.md`. Keep the content, and reinvent everything else: layout, type, color, imagery and motion.
 
 **The real goal:** Learn how AI design tools work in practice. A good-looking site is nice, but a clear story about what the tool did well and badly is worth just as much.
+
+**Scope: local only.** Build and run your design on your own laptop (or inside your tool's preview). The goal is a working site with a cohesive look and feel across every section. Don't spend time on deploying, hosting, custom domains or Git. Deploying will happen separately, later, once we've picked the designs we like best. If your tool can publish, you're welcome to use that for a quick preview, but it isn't part of the challenge.
 
 ---
 
@@ -11,20 +13,20 @@
 Each team picks one lane and one main tool, so that at the showcase we're comparing *approaches*, not just results. Tool features and free tiers change quickly, so check access before the event.
 
 ### Lane A: AI design canvas (design first, code second)
-You describe the site, get visual mockups on a canvas, refine them by pointing and prompting, then export.
+You describe the site, get visual mockups on a canvas, refine them by pointing and prompting, then export the code to run locally.
 
 | Tool | Notes |
 |---|---|
 | **Claude Design** (claude.ai/design) | Anthropic's prompt-to-prototype canvas. You can refine by chatting or by editing directly on the canvas. Exports standalone HTML and can hand off to Claude Code. Needs a paid Claude plan. |
 | **Google Stitch** (stitch.withgoogle.com) | Google Labs. Free with a Google account, with daily credits. Accepts text, sketches or screenshots, generates several screens on an infinite canvas, and exports HTML/Tailwind or React. |
 | **Figma Make** | Prompt-to-prototype inside Figma. A good fit if someone on the team already knows Figma. |
-| **Framer AI** | Generates a site you can publish right away, with strong motion and animation. Has a free tier. |
+| **Framer AI** | Generates a complete site with strong motion and animation, previewed in the editor. Has a free tier. |
 
 **Good for:** people who think visually and want to see several options quickly.
 **Watch for:** layouts that look alike from one generation to the next, and exports that are hard to edit.
 
-### Lane B: Prompt-to-app builders (chat your way to a live site)
-You chat, and the tool writes and hosts the code.
+### Lane B: Prompt-to-app builders (chat your way to a working site)
+You chat, and the tool writes the code and shows it in a live preview. Download or export the code if you want a local copy.
 
 | Tool | Notes |
 |---|---|
@@ -32,7 +34,7 @@ You chat, and the tool writes and hosts the code.
 | **Lovable** | Full app builder with a visual editor. |
 | **Bolt.new** | Similar idea to Lovable, running in the browser. |
 
-**Good for:** getting a working, shareable URL fast.
+**Good for:** getting a working, clickable site fast.
 **Watch for:** the default "AI SaaS landing page" look (purple gradients, glassy cards, centered hero). You'll have to push hard to get away from it.
 
 ### Lane C: Coding agent + a design skill (code first, taste added)
@@ -130,7 +132,7 @@ Pick any tool, but add a constraint that forces a real point of view:
 
 ## 5. Showcase (5 min per team)
 
-1. **Show it.** Demo the live site, on a phone too if possible.
+1. **Show it.** Demo the site running locally (or in your tool's preview), including a narrow phone-width view.
 2. **The journey.** Show one screenshot of a concept you rejected and explain why.
 3. **Tool verdict.** Where did the tool save you time, where did it fight you, and would you use it again?
 
