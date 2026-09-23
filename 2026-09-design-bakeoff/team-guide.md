@@ -4,6 +4,8 @@
 
 **The real goal:** Learn how AI design tools work in practice. A good-looking site is nice, but a clear story about what the tool did well and badly is worth just as much.
 
+**Stretch goal:** if you have time left, add a "Past Meetups" section, portfolio or timeline built from `past-meetups.md`. It has 17 meetups with dates, speakers and short summaries, and it's a good test of how your tool handles a larger, repeating set of content.
+
 ---
 
 ## 1. Pick a lane
