@@ -46,6 +46,23 @@ From a phone or second laptop on the same Wi-Fi, open that address, upload a sma
 
 If it does not connect, check that both devices are on the same network, allow incoming port 3923 on the trusted private network if the firewall asks, and check whether the Wi-Fi blocks connections between devices. If startup reports that port 3923 is already in use, stop the previous server with Ctrl+C in its terminal before starting this one.
 
+### When venue Wi-Fi blocks device connections
+
+Some venue or guest Wi-Fi networks let everyone reach the internet but block connections between devices (called **client isolation** or **AP isolation**). Being on the same Wi-Fi, or even the same IP subnet, does not guarantee your teammates can reach the drop folder. Test at the venue before the event; a successful test at home or in the lead's own browser is not enough.
+
+If teammates' connections time out, check the laptop firewall first: Windows can treat venue Wi-Fi as Public even if home Wi-Fi is Private, so the same firewall exception might not apply. Changing ports will not bypass client isolation. If access works through a laptop hotspot but fails through venue Wi-Fi, venue filtering is the likely cause.
+
+**Windows laptop hotspot workaround** (tested with a phone at the venue):
+
+1. Leave Copyparty running. On the lead's laptop, open **Settings → Network & internet → Mobile hotspot**, choose the internet connection to share, and enable sharing over Wi-Fi. Share the hotspot name and password with your team. See [Microsoft's hotspot instructions](https://support.microsoft.com/en-us/windows/experience/connectivity-networking/use-your-windows-device-as-a-mobile-hotspot).
+2. Connect teammates' devices to the laptop's hotspot instead of directly to venue Wi-Fi.
+3. Run `ipconfig` on the laptop and find the IPv4 address of its hotspot adapter (often named `Local Area Connection*`, with an address such as `192.168.137.1`). Share `http://<hotspot-IP>:3923/`, using the actual address. Copyparty already listens on all IPv4 interfaces, so no config change is needed. If you restart it, choose the hotspot address from the startup list rather than the venue Wi-Fi address/QR code.
+4. Test an upload and download from a teammate's device, and check that everyone can still reach the online tools they need. Keep the laptop awake and the hotspot enabled during the event; turn it off afterward.
+
+The laptop's venue Wi-Fi address may still work from devices connected to its hotspot, but prefer the hotspot adapter's address so the shared link does not depend on the venue address. The hotspot's Wi-Fi password is separate from Copyparty: the drop folder still needs no login.
+
+For other operating systems, or if laptop hotspot sharing is unavailable, use a separate team network/router that permits device connections. Test it before relying on it; hotspot and internet-sharing support varies by device.
+
 ## 4. Stop afterward
 
 Keep the laptop awake during the meetup. Press **Ctrl+C** in the server terminal when finished. Uploaded files remain in `share/`, so you can give them to your local coding agent.

@@ -107,6 +107,8 @@ Set it up and test it before the meetup:
 2. **Share the Wi-Fi address** printed at startup, such as `http://192.168.1.47:3923/`, or the QR code. `127.0.0.1` only works on your own laptop. Allow incoming connections on port 3923 on the trusted private network if your firewall asks.
 3. **Test it** from a phone or second laptop on the same Wi-Fi: open that address, upload a file, and download it back. Check that it landed in `share/` on your laptop.
 
+**Venue Wi-Fi caveat:** some networks block connections between devices (client/AP isolation), even when both devices are on the same Wi-Fi. Test at the venue in advance: working at home or on the lead's laptop does not confirm teammates can connect. If their connections time out, use a laptop hotspot or a separate team network that allows device connections; see the [hotspot workaround](copyparty/README.md#when-venue-wi-fi-blocks-device-connections). Changing Copyparty's port will not bypass client isolation.
+
 The example requires no password: anyone who can reach it can browse, download, and upload files in `share/`. Use it for disposable team files on trusted Wi-Fi. Keep personal files out of the folder and don't expose the port to the internet.
 
 On the day, share the address with your team and keep your laptop awake. Press **Ctrl+C** in the server terminal to shut it down afterward.
