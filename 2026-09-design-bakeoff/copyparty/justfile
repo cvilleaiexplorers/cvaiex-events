@@ -1,0 +1,6 @@
+# Optional convenience for people who already have just.
+set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
+
+# Runs in this terminal on macOS, Linux, or Windows. Ctrl+C stops it.
+serve:
+    uv tool run copyparty==1.20.24 -c copyparty.conf
