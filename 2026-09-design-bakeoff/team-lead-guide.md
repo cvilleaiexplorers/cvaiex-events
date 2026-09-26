@@ -3,7 +3,7 @@
 This guide is for team leads. Before the meetup, you choose your team's lane and tool and get it set up. Your team members follow `team-guide.md`.
 
 1. **Choose a lane and tool** from the lanes below. Each team picks one lane and one main tool, so that at the showcase we're comparing *approaches*, not just results. Tell the organizers which one you picked so that teams don't all choose the same tool.
-2. **Set it up** using the [setup checklist](#setup-checklist). Every minute spent signing up or installing on the day comes out of your 60 minutes.
+2. **Set it up** using the [setup checklist](#setup-checklist). If you like, also set up a [team drop folder](#optional-a-team-drop-folder-with-copyparty). Every minute spent signing up or installing on the day comes out of your 60 minutes.
 3. **Brief your team.** Share `team-guide.md`, and tell them whether they need to bring a lookbook (required for Lane D, optional otherwise).
 
 ---
@@ -95,3 +95,19 @@ Do this before the meetup, on the laptop that will run the tool on the day. Tool
 **Lane D (reference-driven)**
 - [ ] For the Mobbin MCP server: sign in to a paid Mobbin plan and connect the server to your agent.
 - [ ] For ChatGPT Images 2.0: confirm you can generate an image in ChatGPT or Codex.
+
+---
+
+## Optional: a team drop folder with Copyparty
+
+[Copyparty](https://github.com/9001/copyparty) turns a folder on your laptop into a shared folder on the room Wi-Fi. Teammates open its address in a browser and drag in files (lookbook images, screenshots, exports) without installing anything. The files land on your laptop, ready to give to your tool. Local agents (Lane C) can also read and write the folder over HTTP; see the [client examples](https://github.com/9001/copyparty#client-examples).
+
+Set it up and test it before the meetup:
+
+1. **Install** Copyparty on your laptop only. The [quickstart](https://github.com/9001/copyparty#quickstart) has a Windows executable, a self-contained Python script and other options.
+2. **Share one disposable folder**, such as `hackathon-share/`, with a team account and a fresh password. See [accounts and volumes](https://github.com/9001/copyparty#accounts-and-volumes).
+3. **Allow incoming connections** on port 3923 if your firewall asks. Each laptop has its own IP address, so every team can use port 3923.
+4. **Find your address.** At startup, Copyparty lists the addresses it's available at. Use the one marked `external`, such as `http://192.168.1.47:3923/`, not `127.0.0.1`. Start it with `--qr` to also show a QR code teammates can scan.
+5. **Test it** from a phone or second laptop on the same Wi-Fi: open that address, upload a file and download it back.
+
+On the day, share the address with your team, keep your laptop awake, and shut the server down afterward. It uses plain HTTP, so keep personal files out of the folder and don't expose the port to the internet.
