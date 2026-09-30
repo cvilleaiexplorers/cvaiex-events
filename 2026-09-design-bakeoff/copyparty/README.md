@@ -20,7 +20,7 @@ Open a new terminal after installation. See the [uv installation instructions](h
 
 ## 2. Start the folder
 
-If you have this repository, open a terminal in `design-hackathon/copyparty/` (the directory containing `copyparty.conf`). The empty `share/` folder is included.
+If you have this repository, open a terminal in `2026-09-design-bakeoff/copyparty/` (the directory containing `copyparty.conf`). The empty `share/` folder is included.
 
 If you are downloading just this example, save [copyparty.conf](copyparty.conf) in a new folder, open a terminal there, and create a folder named `share` alongside it:
 
