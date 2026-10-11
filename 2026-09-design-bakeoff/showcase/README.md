@@ -17,6 +17,8 @@ teams/<team-slug>/
 ```
 
 - **`site/`** holds the contents of the team's `build/` folder. It must work when served from any subpath: relative asset paths only, no requests to other domains.
+- **Externally hosted designs** stay where their authors deployed them. They have a `url:` in the team card and no `site/` folder.
+- **Organizer additions** to a team's narrative or brief go below a horizontal rule, under a dated heading, so the team's own words stay separate.
 - **Team card:** the `README.md` opens with YAML front matter. The viewer reads this, and nothing else repeats it:
 
   ```yaml
@@ -28,6 +30,7 @@ teams/<team-slug>/
   designs:
     - slug: design-slug
       title: Design title
+      url: https://…        # only for externally hosted designs
   ---
   ```
 
@@ -43,4 +46,5 @@ teams/<team-slug>/
 
 | Team | Lead | Lane | Tool |
 |---|---|---|---|
+| [Codex](teams/lane-b-codex/) | Sifan Y. | B | Codex (ChatGPT desktop app) |
 | [Claude Code + Impeccable](teams/lane-c-claude-impeccable/) | Mike P. | C | Claude Code (Opus 5.5) + Impeccable |
