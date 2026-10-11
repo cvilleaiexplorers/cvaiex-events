@@ -15,3 +15,5 @@ Lane C: a coding agent plus a design skill. We used Claude Code running Opus 5.5
 ## Designs
 
 - **[Blue Ridge at Dusk](designs/blue-ridge-at-dusk/):** a live WebGL particle field of the ridgelines west of Charlottesville, in a haze-blue palette with a single ember accent. See its [process narrative](designs/blue-ridge-at-dusk/process-narrative.md) and [design brief](designs/blue-ridge-at-dusk/design-brief.md).
+
+The design's `site/` folder is the static build, with no build step and its fonts bundled. Its [`journey/`](designs/blue-ridge-at-dusk/journey/) folder holds Impeccable's working files: the product brief, the direction round, the committed direction contract, `DESIGN.md` and the final screenshots.

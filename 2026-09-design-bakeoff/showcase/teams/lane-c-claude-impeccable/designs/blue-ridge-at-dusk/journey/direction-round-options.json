@@ -1,0 +1,132 @@
+{
+  "title": "Choose the visual world: CvAIEx homepage",
+  "question": "The roll assigned The Shadow Board. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "The Shadow Board",
+      "kicker": "THE ROLL",
+      "lineage": "Studio IX's warm-industrial room and the painted shadow board on a workshop pegboard",
+      "thesis": "The site is the shop wall: every section hangs on a peg, and a painted outline marks where each thing belongs, including you.",
+      "palette": ["#2F6B4F", "#E0C79A", "#A9B0B3", "#1C2023", "#F2D21B"],
+      "materials": ["powder-coated perforated steel", "birch-ply tags", "painted shadow outlines", "label-maker tape"],
+      "viewport": "A full-bleed green pegboard with the name on label-maker tape. The next-meetup date hangs as a hi-vis tag big enough to cross a panel seam, with Meetup and Slack hung as tools beside it.",
+      "risk": "Tips into a garage-craft costume if the rendering gets literal. It has to stay flat, crisp and modern, and the hole grid must be the real layout grid.",
+      "raised": [
+        { "from": "challenger-itasha", "raise": "Scale courage: the date tag is set big enough to break across a panel seam, one object crossing the board's joints." },
+        { "from": "challenger-console", "raise": "Declared priority: every hung item has a phone rank, so a narrow screen collapses to date, then join, then the rest, never an accidental stack." },
+        { "from": "challenger-shader", "raise": "Live surface, not a texture: the perforation lattice is generated at runtime and is the layout grid at every width, so each item truly hangs on a hole." },
+        { "from": "challenger-vu", "raise": "One module as the ruler: About, Activities and Get Involved hang as identical tags at one hook spacing, read by sweeping the row." },
+        { "from": "challenger-cape", "raise": "One pull, one transformation: Learn More lifts the Studio IX tool off its hook, uncovering its painted outline and the tour details behind it." },
+        { "from": "challenger-ikebana", "raise": "Charged emptiness: an empty outline waits for the visitor in Join Us, and a TBA date leaves the tag's outline on the board, deliberate, not broken." }
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "The Wall Calendar",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "The wall calendar everyone checks before committing to a Tuesday night",
+      "thesis": "The next meetup is the product, so the homepage is this month's page with one day circled in marker.",
+      "palette": ["#F6F6F3", "#161616", "#FF4F9A", "#1E46D8"],
+      "materials": ["printed month grid", "felt-tip marker", "tear-off pages"],
+      "viewport": "This month's grid fills the screen with the meetup day circled in marker and linked to Meetup. In the TBA state the page tears to next month with a marker question mark.",
+      "risk": "The most familiar of my candidates: 'the date is the hero' is where event sites land (the team guide even uses it as a lookbook example), and a grid can read like a scheduling app."
+    },
+    {
+      "id": "challenger-itasha",
+      "label": "Itasha Vinyl Wrap",
+      "verdict": "declined",
+      "lineage": "printed-vinyl wrapped cars with sponsor strips along the sill",
+      "thesis": "The site as a wrapped car: name broken across panels, Studio IX as the sill sponsor strip.",
+      "palette": ["#F4F4F4", "#FF2D87", "#19C3E6", "#111111"],
+      "materials": ["printed vinyl gloss", "panel seams"],
+      "viewport": "The name wrapped across door panels, a number roundel, sponsor strip along the bottom.",
+      "case": "Fuses poorly: neither audience lives in car-wrap culture, and the illustration it needs does not exist.",
+      "kept": "Scale courage: one element breaking across seams.",
+      "risk": "Costume without an illustration program behind it.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-itasha-vinyl-wrap-hero.webp"
+    },
+    {
+      "id": "challenger-console",
+      "label": "Dark Developer Console",
+      "verdict": "declined",
+      "lineage": "graphite IDE panels with syntax-colored state",
+      "thesis": "The group as a working console: panels for next meetup, join, sponsor.",
+      "palette": ["#1B1E22", "#2A2F35", "#7FD1B9", "#E6C07B"],
+      "materials": ["graphite panels", "hairline seams"],
+      "viewport": "Tiled panels with the next meetup in the primary pane.",
+      "case": "Builders feel at home; newcomers read it as not for them, and near-black plus syntax accents is an AI-default look.",
+      "kept": "Declared collapse priority.",
+      "risk": "Insider signal that beginners bounce off.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console-hero.webp"
+    },
+    {
+      "id": "challenger-shader",
+      "label": "WebGL Shader Portal",
+      "verdict": "declined",
+      "lineage": "experiential-studio portals over living shader fields",
+      "thesis": "A breathing shader field with thin type floating over it.",
+      "palette": ["#0B0A1F", "#5B2EFF", "#FF9A3C"],
+      "materials": ["fragment shader", "film grain"],
+      "viewport": "One oversized word over a full-screen shader, tiny corner links.",
+      "case": "The AI-startup gloss the brief rules out, and it hides the date behind a mood.",
+      "kept": "A live-rendered surface, not a static texture.",
+      "risk": "Pure gloss; the offer disappears.",
+      "hero": "https://impeccable.style/worlds/cards/webgl-shader-portal-hero.webp"
+    },
+    {
+      "id": "challenger-vu",
+      "label": "VU Meter Bridge",
+      "verdict": "declined",
+      "lineage": "recording-desk meter bridges",
+      "thesis": "A row of needles, one per activity, leaning together.",
+      "palette": ["#EFE6D2", "#141414", "#C8202A", "#5A3B22"],
+      "materials": ["meter glass", "walnut and steel"],
+      "viewport": "A bridge of identical meters across the top, the date on the master meter.",
+      "case": "There is no real signal to meter here, so the needles would be decoration.",
+      "kept": "Identical repeated modules as the ruler.",
+      "risk": "Instrument cosplay with nothing to measure.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-vu-meter-bridge-hero.webp"
+    },
+    {
+      "id": "challenger-cape",
+      "label": "Drawcord Cape",
+      "verdict": "declined",
+      "lineage": "transforming fashion garments with drawcord channels",
+      "thesis": "One gold cord pulls a flat plane into a shaped volume.",
+      "palette": ["#0E0E0E", "#C9A445", "#4A4F55"],
+      "materials": ["matte silk", "gold cord"],
+      "viewport": "A black semicircle; pulling the cord gathers it into the page.",
+      "case": "A luxury-fashion register that neither builders nor newcomers see themselves in.",
+      "kept": "One control, one whole transformation.",
+      "risk": "Precious where the group is practical.",
+      "hero": "https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-drawcord-transforming-cape-hero.webp"
+    },
+    {
+      "id": "challenger-ikebana",
+      "label": "Ikebana Ma",
+      "verdict": "declined",
+      "lineage": "tokonoma alcove arrangements",
+      "thesis": "One branch, three stems, and charged emptiness.",
+      "palette": ["#E9E4DA", "#6E6456", "#3B55A0", "#4B3A2A"],
+      "materials": ["plaster", "weathered pine", "bronze"],
+      "viewport": "An off-center arrangement with the name as a vertical line in quiet space.",
+      "case": "Beautiful restraint, but too quiet for a room of people building things.",
+      "kept": "Charged empty space.",
+      "risk": "Serene to the point of absent.",
+      "hero": "https://impeccable.style/worlds/cards/growth-metamorphosis-branching-ikebana-ma-arrangement-hero.webp"
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code" },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "A clean, modern community landing page, played straight at full craft.",
+    "palette": ["#FFFFFF", "#0F172A", "#2563EB"],
+    "materials": ["clean grid", "event card"],
+    "viewport": "Left-aligned name and tagline, a next-meetup card with a Join button, then single-column sections and a sponsor block.",
+    "risk": "Indistinguishable from every other meetup site by design."
+  },
+  "steer": true
+}

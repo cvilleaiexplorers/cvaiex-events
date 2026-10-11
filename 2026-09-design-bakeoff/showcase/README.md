@@ -14,9 +14,11 @@ teams/<team-slug>/
     process-narrative.md     how this design was made
     design-brief.md          what was built (optional)
     cover.png                screenshot for the viewer
+    journey/                 the team's working files (optional)
 ```
 
 - **`site/`** holds the contents of the team's `build/` folder. It must work when served from any subpath: relative asset paths only, no requests to other domains.
+- **`journey/`** holds working files the team handed in alongside the design, such as agent briefs, decision records, a design-system doc and screenshots. It has its own `README.md` listing them.
 - **Externally hosted designs** stay where their authors deployed them. They have a `url:` in the team card and no `site/` folder.
 - **Organizer additions** to a team's narrative or brief go below a horizontal rule, under a dated heading, so the team's own words stay separate.
 - **Team card:** the `README.md` opens with YAML front matter. The viewer reads this, and nothing else repeats it:
@@ -42,7 +44,7 @@ teams/<team-slug>/
 - **Headings:** each design file starts with `# Process narrative: <Design title>` or `# Design brief: <Design title>`. The title matches the one on the team card.
 - **Names:** lowercase, hyphenated slugs. A design's slug comes from its title (`blue-ridge-at-dusk`). No folder or file name starts with `_`, because GitHub Pages' Jekyll build skips those.
 - **Size:** no single file over about 25 MB, and no video in the repo. Link to large media instead.
-- **Not committed:** raw zips, agent transcripts, source projects and contact details stay with the organizers.
+- **Not committed:** raw zips, agent transcripts, source projects and participants' contact details stay with the organizers. The sponsor's published tour contacts, which come from `site-content.md`, can appear in a team's `site/`.
 
 ## Teams
 
