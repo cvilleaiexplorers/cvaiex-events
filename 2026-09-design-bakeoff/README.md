@@ -10,5 +10,6 @@ These materials moved here from `design-hackathon/` in the website repo; their h
 | [`team-guide.md`](team-guide.md) | For team members: the challenge, lookbook, 60-minute workflow, prompts. |
 | [`site-content.md`](site-content.md) | The site's text content, the only starting point for each redesign. |
 | [`past-meetups.md`](past-meetups.md) | Portfolio of past meetups, used as stretch content. |
+| [`showcase/`](showcase/) | After the event: each team's deployable designs, process narratives and design briefs. |
 | [`copyparty/`](copyparty/) | A portable Copyparty setup for sharing files with teammates over the room Wi-Fi. |
 | `STUDIO_IX_Logo_White.jpg` | Venue logo. |
