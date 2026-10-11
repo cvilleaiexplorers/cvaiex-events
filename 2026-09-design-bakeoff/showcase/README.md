@@ -31,6 +31,8 @@ teams/<team-slug>/
     - slug: design-slug
       title: Design title
       url: https://…        # only for externally hosted designs
+      tool: …               # optional: when this design's tool differs from the team's
+      source: https://…     # optional: the team's source repo, pinned to a commit
   ---
   ```
 
@@ -46,5 +48,6 @@ teams/<team-slug>/
 
 | Team | Lead | Lane | Tool |
 |---|---|---|---|
-| [Codex](teams/lane-b-codex/) | Sifan Y. | B | Codex (ChatGPT desktop app) |
+| [Codex native](teams/lane-b-codex-native/) | Sifan Y. | B | Codex (ChatGPT desktop app) |
 | [Claude Code + Impeccable](teams/lane-c-claude-impeccable/) | Mike P. | C | Claude Code (Opus 5.5) + Impeccable |
+| [Claude Code + OpenCode native](teams/lane-c-claude-opencode-native/) | Eugene G. and Travis E. | C | Claude Code (Opus 5.5) and OpenCode, no design skill |

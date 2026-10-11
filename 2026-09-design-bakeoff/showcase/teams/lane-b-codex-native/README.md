@@ -1,5 +1,5 @@
 ---
-team: Codex
+team: Codex native
 lead: Sifan Y.
 lane: B
 tool: Codex (ChatGPT desktop app)
@@ -9,7 +9,7 @@ designs:
     url: https://cville-ai-focus.sifanye-ghost.chatgpt.site
 ---
 
-# Codex
+# Codex native
 
 Lane B: prompt-to-app. The team prompted Codex in the ChatGPT desktop app, with no design skill. Codex researched the community, wrote the code and generated the main artwork, and the site was hosted with Sites.
 
