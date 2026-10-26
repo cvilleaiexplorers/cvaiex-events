@@ -8,9 +8,9 @@ Codex checked the mobile layout, interactions, and calendar error handling. It w
 
 ---
 
-## Context from Sifan's design notes, 2026-10-10 (organizers' notes)
+## Organizers' notes, 2026-10-10
 
-*Everything above the line is Sifan's. The notes below summarize the [design notes](https://cville-ai-woven.sifanye-ghost.chatgpt.site/design-notes.html) Sifan published with an earlier version of this design.*
+From Sifan's [design notes](https://cville-ai-woven.sifanye-ghost.chatgpt.site/design-notes.html):
 
 - **How it was made:** Codex did public-source research on the community, generated the original artwork and wrote custom HTML, CSS and JavaScript, with no framework. The finished site doesn't call an AI service when someone visits it.
 - **Where the direction came from:** the local reference, the Ix site's textile history. The notes credit that and a precise brief with giving the AI-assisted design something real to work with, and say visual polish still needed fact-checking, careful interaction design and testing on a phone.

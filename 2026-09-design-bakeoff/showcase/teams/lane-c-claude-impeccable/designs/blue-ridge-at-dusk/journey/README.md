@@ -21,4 +21,4 @@ The Shader Portal quality-bar references came from the Impeccable catalog: https
 ## Filed 2026-10-10 (organizers' notes)
 
 - **Collected as handed in:** every file in the team's `demo-snapshot/journey/` is here. The decision page screenshots show Impeccable's interface and catalog artwork; whether the showcase displays them is decided when the showcase is built.
-- **Where the build went:** the team's `build/` folder is `../site/`, and `../cover.png` is `screenshots/desktop-fold.png`.
+- **Where the build went:** the team's `build/` folder is `../site/`, and `../cover.png` is the build's first screen at 1440×900 with the next meetup filled in (`?next=2026-10-28`).

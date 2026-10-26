@@ -8,9 +8,7 @@ Details expand on demand, and the cards scroll sideways on phones. Gentle motion
 
 ---
 
-## Observed on the deployed site, 2026-10-10 (organizers' notes)
-
-*Everything above the line is Sifan's. The notes below come from the organizers, who read the live site at [cville-ai-focus.sifanye-ghost.chatgpt.site](https://cville-ai-focus.sifanye-ghost.chatgpt.site) and its CSS and JavaScript, and from the [design notes](https://cville-ai-woven.sifanye-ghost.chatgpt.site/design-notes.html) Sifan published with an earlier version. The site is live, so the meetup content will have changed since then.*
+## Organizers' notes, 2026-10-10
 
 **Concept.** The hero art (`filament-knot.webp`) is an AI-generated abstraction of luminous strands knotted into a single form. According to Sifan's design notes, it refers to the Ix site's textile mill (1928–1999), now a neighborhood of art, work and community, which suggested "individual strands woven into a shared form." The notes also say the image is original, not a photo of the venue or an existing local artwork. The copy around it is spare: a short headline, "Stay curious. Build together.", with "together." in lime.
 

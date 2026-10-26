@@ -17,7 +17,7 @@ teams/<team-slug>/
     journey/                 the team's working files (optional)
 ```
 
-- **`site/`** holds the contents of the team's `build/` folder. It must work when served from any subpath: relative asset paths only, no requests to other domains.
+- **`site/`** holds the contents of the team's `build/` folder. It must work when served from any subpath, so asset paths are relative. Loading free Google Fonts is fine; otherwise the build makes no requests to other domains.
 - **`journey/`** holds working files the team handed in alongside the design, such as agent briefs, decision records, a design-system doc and screenshots. It has its own `README.md` listing them.
 - **Externally hosted designs** stay where their authors deployed them. They have a `url:` in the team card and no `site/` folder.
 - **Organizer additions** to a team's narrative or brief go below a horizontal rule, under a dated heading, so the team's own words stay separate.
