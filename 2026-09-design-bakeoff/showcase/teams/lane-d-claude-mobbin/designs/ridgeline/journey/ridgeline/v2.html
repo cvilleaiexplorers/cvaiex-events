@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cville AI Explorers</title>
+<meta name="description" content="Building with AI in Charlottesville, Virginia">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='14' fill='%232A3259'/%3E%3Cpath d='M4 19 L10 12 L13 15 L18 8 L24 19' fill='none' stroke='%23FFF6E8' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='18' cy='8' r='2.2' fill='%23F2A93B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  /*
+    One scene for the whole page: a descent from the Blue Ridge crest
+    (Humpback Rocks, 3,080 ft) to downtown Charlottesville (594 ft),
+    dusk into night. Scroll progress drives the sky, ridges, haze,
+    stars, town lights and the altimeter.
+  */
+  :root {
+    --warm: #FFF6E8;
+    --warm-soft: rgba(255, 246, 232, 0.82);
+    --marigold: #F2A93B;
+    --ink: #232A4D;
+    --deep: #131936;
+    --rule: rgba(255, 246, 232, 0.2);
+    --gutter: clamp(16px, 4vw, 56px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--deep);
+    color: var(--warm);
+    font-family: "Archivo", system-ui, sans-serif;
+    font-variation-settings: "wdth" 100;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--marigold); outline-offset: 3px; border-radius: 4px; }
+
+  .display {
+    font-variation-settings: "wdth" 125;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.92;
+  }
+
+  /* ---------- The stage (fixed, behind everything) ---------- */
+  .stage { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .sky { position: absolute; inset: 0; }
+  .sky-dusk {
+    background:
+      radial-gradient(60% 40% at 72% 70%, rgba(255, 214, 170, 0.75), transparent 70%),
+      radial-gradient(40% 30% at 18% 22%, rgba(255, 236, 220, 0.28), transparent 70%),
+      linear-gradient(180deg, #7C8FB8 0%, #9AA3C4 38%, #D9B8B0 62%, #F6C9A0 78%, #F6C9A0 100%);
+  }
+  .sky-blue {
+    opacity: 0;
+    background:
+      radial-gradient(55% 30% at 70% 72%, rgba(233, 160, 130, 0.55), transparent 70%),
+      linear-gradient(180deg, #33427A 0%, #56598E 45%, #A9839C 72%, #D99A86 90%);
+  }
+  .sky-night {
+    opacity: 0;
+    background: linear-gradient(180deg, #111936 0%, #1A2450 50%, #2A3664 82%, #3A416E 100%);
+  }
+
+  /* The sun sets behind the ridges as we descend */
+  .sun {
+    position: absolute; left: 68%; top: 47svh;
+    width: clamp(56px, 9vmin, 110px); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 50% 45%, #FFF8EC 0%, #FFE9CC 60%, #FFD9AE 100%);
+    box-shadow: 0 0 60px 24px rgba(255, 214, 170, 0.55), 0 0 160px 80px rgba(255, 196, 150, 0.3);
+    will-change: transform, opacity;
+  }
+
+  .stars { position: absolute; left: 0; right: 0; top: 0; height: 48%; opacity: 0; }
+  .stars i {
+    position: absolute; width: 2px; height: 2px; border-radius: 50%;
+    background: var(--warm);
+  }
+  .stars i.b { width: 3px; height: 3px; box-shadow: 0 0 6px rgba(255, 246, 232, 0.8); }
+
+  .ridge {
+    --under: 90svh;
+    position: absolute; left: -12%; width: 124%;
+    bottom: calc(-1 * var(--under));
+    height: calc(var(--h) + var(--under));
+    transform-origin: 50% 0;
+    will-change: transform;
+  }
+  .ridge svg { display: block; width: 100%; height: var(--h); transform-origin: 50% 100%; will-change: transform; overflow: visible; }
+  .ridge path { fill: var(--c); }
+  .ridge .fill { height: var(--under); background: var(--c); margin-top: -1px; }
+  .r1 { --h: 62svh; --c: #8C98C2; }
+  .r2 { --h: 52svh; --c: #6674A3; }
+  .r3 { --h: 42svh; --c: #4F5F8F; }
+  .r4 { --h: 31svh; --c: #3B4674; }
+  .r5 { --h: 20svh; --c: #2A3259; }
+
+  /* Blue Ridge haze, sitting in the hollows in front of each ridge */
+  .fog {
+    position: absolute; left: -20%; width: 140%; height: 30svh;
+    top: calc(var(--h) * 0.2);
+    opacity: 0;
+    background:
+      radial-gradient(30% 50% at 18% 55%, rgba(226, 231, 247, 0.7), transparent 70%),
+      radial-gradient(26% 42% at 46% 45%, rgba(226, 231, 247, 0.6), transparent 70%),
+      radial-gradient(34% 55% at 76% 60%, rgba(226, 231, 247, 0.65), transparent 70%);
+    will-change: transform, opacity;
+  }
+
+  .lights { position: absolute; left: 0; right: 0; top: 8svh; height: 15svh; opacity: 0; }
+  .lights i {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: #FFD9A0; box-shadow: 0 0 8px 1px rgba(255, 200, 120, 0.7);
+  }
+  .lights .home {
+    position: absolute; left: 53%; top: 40%;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.8rem; font-weight: 700; color: var(--marigold); white-space: nowrap;
+  }
+  .lights .home b {
+    width: 9px; height: 9px; border-radius: 50%; background: var(--marigold);
+    box-shadow: 0 0 0 5px rgba(242, 169, 59, 0.25), 0 0 18px 4px rgba(242, 169, 59, 0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .lights i:nth-child(3n) { animation: twinkle 3.4s ease-in-out infinite; }
+    .lights i:nth-child(5n) { animation: twinkle 4.8s ease-in-out infinite 1s; }
+    @keyframes twinkle { 50% { opacity: 0.35; } }
+  }
+
+  /* Fireflies over the valley once it's dark */
+  .fireflies { position: absolute; left: 0; right: 0; bottom: 0; height: 42svh; opacity: 0; }
+  .fireflies i {
+    position: absolute; width: 4px; height: 4px; border-radius: 50%;
+    background: #EEF5A6; box-shadow: 0 0 10px 3px rgba(226, 240, 140, 0.55);
+    opacity: 0.6;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fireflies i { animation: glow var(--t, 4s) ease-in-out infinite var(--d, 0s), wander var(--w, 9s) ease-in-out infinite alternate var(--d, 0s); }
+    @keyframes glow { 0%, 60%, 100% { opacity: 0.05; } 75% { opacity: 1; } }
+    @keyframes wander { to { transform: translate(var(--x, 20px), var(--y, -30px)); } }
+  }
+
+  .grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.2; mix-blend-mode: overlay; }
+
+  /* Survey grid, fixed over the scene for the whole descent */
+  .survey {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    padding-inline: var(--gutter);
+  }
+  .survey span { border-left: 1px solid rgba(255, 246, 232, 0.2); position: relative; }
+  .survey span:last-child { border-right: 1px solid rgba(255, 246, 232, 0.2); }
+  .survey span::after {
+    content: attr(data-tick);
+    position: absolute; left: 8px; bottom: 14px;
+    font-size: 0.72rem; letter-spacing: 0.04em;
+    color: rgba(255, 246, 232, 0.6);
+    font-variant-numeric: tabular-nums;
+    opacity: var(--ticks, 1);
+  }
+
+  /* Altimeter */
+  .alt {
+    position: fixed; z-index: 3; pointer-events: none;
+    right: calc(var(--gutter) + 14px); top: 22svh; bottom: 22svh;
+    width: 150px;
+    display: flex; flex-direction: column; align-items: flex-end;
+    font-size: 0.75rem; color: var(--warm-soft);
+    text-align: right;
+  }
+  .alt .end { line-height: 1.3; }
+  .alt .end b { display: block; color: var(--warm); font-weight: 700; }
+  .alt .track { position: relative; flex: 1; width: 1px; margin: 10px 0; background: rgba(255, 246, 232, 0.35); }
+  .alt .track::before, .alt .track::after {
+    content: ""; position: absolute; right: 0; width: 9px; height: 1px; background: rgba(255, 246, 232, 0.6);
+  }
+  .alt .track::before { top: 0; }
+  .alt .track::after { bottom: 0; }
+  .alt .bob {
+    position: absolute; right: -5px; top: 0;
+    display: flex; align-items: center; gap: 10px; flex-direction: row-reverse;
+    transform: translateY(-50%);
+  }
+  .alt .bob i {
+    width: 11px; height: 11px; border-radius: 50%; background: var(--marigold);
+    box-shadow: 0 0 0 4px rgba(242, 169, 59, 0.28);
+  }
+  .alt .read {
+    font-variation-settings: "wdth" 125; font-weight: 800; font-size: 1.05rem;
+    color: var(--warm); font-variant-numeric: tabular-nums; white-space: nowrap;
+    text-shadow: 0 1px 10px rgba(19, 25, 54, 0.6);
+  }
+  .alt .read small { font-size: 0.7rem; font-weight: 600; margin-left: 3px; }
+
+  /* ---------- Content, composited on the scene ---------- */
+  .page { position: relative; z-index: 2; }
+
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; }
+
+  .nav {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px 16px;
+    padding: 20px var(--gutter); flex-wrap: wrap;
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+    font-variation-settings: "wdth" 125; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.9rem;
+  }
+  .brand svg { width: 28px; height: 28px; }
+  .nav ul { list-style: none; display: flex; gap: 8px; margin: 0; padding: 0; flex-wrap: wrap; }
+  .pill {
+    display: inline-block; padding: 6px 14px;
+    border: 1px solid rgba(255, 246, 232, 0.8); border-radius: 999px;
+    text-decoration: none; font-size: 0.85rem; line-height: 1.2;
+    transition: background-color .2s, color .2s;
+  }
+  .pill:hover { background: var(--warm); color: var(--ink); }
+  .pill.solid { background: var(--warm); color: var(--ink); border-color: var(--warm); }
+  .pill.solid:hover { background: var(--marigold); border-color: var(--marigold); }
+
+  .hero-body {
+    flex: 1; display: grid; grid-template-columns: repeat(6, 1fr);
+    align-content: center; padding: 4vh var(--gutter) 30vh; row-gap: 12px;
+  }
+  .coords { grid-column: 1 / -1; font-size: 0.85rem; letter-spacing: 0.06em; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
+  .coords span + span { margin-left: 1.2em; }
+  h1 { margin: 0; grid-column: 1 / -1; font-size: clamp(2.6rem, 9.2vw, 9rem); text-shadow: 0 2px 30px rgba(42, 50, 89, 0.25); }
+  h1 span { display: block; will-change: transform; }
+  h1 .l1 { padding-left: calc(100% / 6); }
+  .tagline {
+    grid-column: 4 / -1; margin: 18px 0 0;
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem); font-weight: 600; line-height: 1.35; max-width: 22ch;
+    text-shadow: 0 1px 2px rgba(42, 50, 89, 0.55), 0 2px 18px rgba(42, 50, 89, 0.5);
+  }
+
+  .marker {
+    position: absolute; right: calc(var(--gutter) + 100% / 6 * 0.6); bottom: 12vh;
+    display: flex; align-items: flex-end; gap: 14px; text-decoration: none;
+  }
+  .marker .pin {
+    position: relative; width: 22px; height: 22px; flex: none; border-radius: 50%;
+    background: var(--marigold);
+    box-shadow: 0 0 0 6px rgba(242, 169, 59, 0.28), 0 0 0 14px rgba(242, 169, 59, 0.12);
+    margin-bottom: 8px;
+  }
+  .marker .pin::before {
+    content: ""; position: absolute; left: 50%; top: 100%;
+    width: 1px; height: 12vh; background: rgba(255, 246, 232, 0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .marker .pin::after {
+      content: ""; position: absolute; inset: -6px; border-radius: 50%;
+      border: 2px solid var(--marigold); animation: ping 2.6s ease-out infinite;
+    }
+    @keyframes ping { from { transform: scale(0.6); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
+  }
+  .marker .card {
+    background: var(--deep); border: 1px solid rgba(242, 169, 59, 0.55);
+    padding: 14px 18px 16px; border-radius: 4px 18px 18px 18px; min-width: 220px;
+    transition: transform .2s, border-color .2s;
+  }
+  .marker:hover .card { transform: translateY(-3px); border-color: var(--marigold); }
+  .marker .label { display: block; font-size: 0.9rem; color: var(--marigold); font-weight: 700; }
+  .marker .when { display: block; font-variation-settings: "wdth" 125; font-weight: 800; font-size: clamp(1.4rem, 2.4vw, 2rem); line-height: 1.05; text-transform: uppercase; margin-top: 4px; }
+  .marker .sub { display: block; font-size: 0.9rem; margin-top: 6px; color: var(--warm-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .marker[data-state="tba"] .card { border-style: dashed; }
+  .marker[data-state="tba"] .pin { background: transparent; border: 3px solid var(--marigold); }
+
+  .section {
+    position: relative; isolation: isolate;
+    display: grid; grid-template-columns: repeat(6, 1fr); column-gap: 24px;
+    padding: 16vh var(--gutter);
+  }
+  /* A soft pool of shade behind the text, not a card */
+  .section::before {
+    content: ""; position: absolute; z-index: -1; inset: 4vh 0;
+    background: radial-gradient(60% 55% at 45% 50%, rgba(17, 23, 52, 0.55), transparent 75%);
+  }
+  .section h2 {
+    grid-column: 1 / 6; margin: 0 0 32px;
+    font-size: clamp(2.4rem, 7.4vw, 7rem);
+    text-shadow: 0 2px 24px rgba(17, 23, 52, 0.45);
+  }
+  .section h2 .w { display: inline-block; will-change: transform; }
+  .section .body { grid-column: 3 / 6; max-width: 62ch; text-shadow: 0 1px 12px rgba(17, 23, 52, 0.6); }
+  .section .body > p:first-child { margin-top: 0; }
+  .lead { font-size: clamp(1.25rem, 1.9vw, 1.6rem); line-height: 1.45; }
+
+  .waypoints { list-style: none; margin: 0; padding: 0; }
+  .waypoints li { position: relative; padding: 14px 0 14px 40px; border-bottom: 1px solid var(--rule); }
+  .waypoints li:first-child { border-top: 1px solid var(--rule); }
+  .waypoints li::before {
+    content: ""; position: absolute; left: 4px; top: 50%;
+    width: 20px; height: 10px; transform: translateY(-50%);
+    background: var(--marigold);
+    clip-path: polygon(0 100%, 30% 20%, 48% 60%, 70% 0, 100% 100%);
+  }
+  .intro { margin: 0 0 18px; }
+
+  .activities { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); }
+  .activities li { padding: 22px 32px 22px 0; border-top: 2px solid var(--warm); font-size: 1.2rem; line-height: 1.35; font-weight: 500; }
+
+  .section h3 {
+    font-variation-settings: "wdth" 125; font-weight: 800; text-transform: uppercase;
+    font-size: 1.1rem; letter-spacing: 0.02em; margin: 36px 0 12px;
+  }
+
+  .contact-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  .btn {
+    display: inline-block; padding: 10px 20px; border-radius: 999px;
+    border: 1.5px solid var(--warm); text-decoration: none; font-weight: 600;
+    transition: background-color .2s, color .2s;
+  }
+  .btn:hover { background: var(--warm); color: var(--ink); text-shadow: none; }
+
+  .sponsor-plate { display: inline-block; background: var(--warm); padding: 14px 18px; border-radius: 4px 18px 18px 18px; margin-bottom: 20px; }
+  .sponsor-plate img { display: block; width: 220px; max-width: 100%; height: auto; mix-blend-mode: multiply; }
+  details { margin-top: 20px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  summary {
+    cursor: pointer; padding: 14px 0; font-weight: 700; color: var(--marigold);
+    list-style: none; display: flex; align-items: center; gap: 10px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "+"; display: inline-grid; place-items: center;
+    width: 22px; height: 22px; border: 1.5px solid var(--marigold); border-radius: 50%; font-size: 1rem; line-height: 1;
+  }
+  details[open] summary::before { content: "−"; }
+  .tour { list-style: none; padding: 0; margin: 12px 0 20px; display: grid; gap: 6px; }
+  .tour a { text-underline-offset: 3px; }
+
+  footer {
+    position: relative; z-index: 2;
+    padding: 40vh var(--gutter) 36px;
+    display: grid; grid-template-columns: repeat(6, 1fr); column-gap: 24px; row-gap: 20px;
+    text-shadow: 0 1px 12px rgba(17, 23, 52, 0.6);
+  }
+  footer .f-name { grid-column: 1 / 4; margin: 0; font-size: clamp(1.5rem, 3vw, 2.2rem); }
+  footer .f-tag { grid-column: 1 / 4; margin: 0; color: var(--warm-soft); }
+  footer nav { grid-column: 4 / -1; grid-row: 1 / 3; display: flex; gap: 10px; justify-content: flex-end; align-items: flex-start; flex-wrap: wrap; }
+  footer .copy {
+    grid-column: 1 / -1; margin: 24px 0 0; font-size: 0.85rem; color: rgba(255, 246, 232, 0.7);
+    border-top: 1px solid var(--rule); padding-top: 18px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px) {
+    .section h2, .section .body { grid-column: 1 / -1; }
+    .tagline { grid-column: 2 / -1; }
+    footer .f-name, footer .f-tag, footer nav { grid-column: 1 / -1; grid-row: auto; justify-content: flex-start; }
+    /* Altimeter collapses to a readout chip */
+    .alt { top: auto; bottom: 16px; right: 16px; width: auto; }
+    .alt .end, .alt .track::before, .alt .track::after { display: none; }
+    .alt .track { flex: none; width: auto; height: auto; background: none; margin: 0; }
+    .alt .bob {
+      position: static; transform: none !important;
+      background: rgba(19, 25, 54, 0.82); border: 1px solid rgba(242, 169, 59, 0.5);
+      padding: 6px 12px 6px 10px; border-radius: 999px;
+    }
+    .alt .bob i { width: 8px; height: 8px; box-shadow: none; }
+    .alt .read { font-size: 0.9rem; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 1.0625rem; }
+    .survey { grid-template-columns: repeat(3, 1fr); }
+    .survey span:nth-child(n+4) { display: none; }
+    .survey span:nth-child(3) { border-right: 1px solid rgba(255, 246, 232, 0.2); }
+    .survey span:nth-child(3)::after { content: none; }
+    .pill { padding: 5px 11px; font-size: 0.8rem; }
+    h1 { font-size: clamp(2.2rem, 11.5vw, 3.4rem); }
+    h1 .l1 { padding-left: 0; }
+    .tagline { grid-column: 1 / -1; }
+    .hero-body { padding-bottom: 8vh; align-content: start; padding-top: 6vh; }
+    .marker { position: relative; right: auto; bottom: auto; margin: 0 var(--gutter) 22vh; align-self: flex-start; }
+    .marker .pin::before { display: none; }
+    .marker .pin { margin-left: 8px; }
+    .section { padding: 11vh var(--gutter); }
+    .section h2 { font-size: clamp(2.1rem, 11vw, 3.4rem); }
+    .activities { grid-template-columns: 1fr; }
+    .fog.f2 { display: none; }
+    footer { padding-top: 30vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" aria-hidden="true">
+  <div class="sky sky-dusk"></div>
+  <div class="sky sky-blue" id="sky-blue"></div>
+  <div class="sky sky-night" id="sky-night"></div>
+  <div class="stars" id="stars"></div>
+  <div class="sun" id="sun"></div>
+
+  <div class="ridge r1" data-rise="20" data-grow="0.04" data-peak="0.3" data-night="#4B5790">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 210 C 90 170, 160 150, 250 175 S 420 120, 520 140 S 700 90, 820 125 S 1000 150, 1090 110 S 1280 80, 1360 120 L 1440 130 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+  </div>
+  <div class="ridge r2" data-rise="24" data-grow="0.06" data-peak="0.5" data-night="#39457A">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 190 C 120 150, 200 175, 300 150 S 470 110, 590 160 S 760 190, 880 140 S 1060 90, 1170 150 S 1340 170, 1440 140 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="fog f1" data-drift="-18"></div>
+  </div>
+  <div class="ridge r3" data-rise="28" data-grow="0.08" data-peak="0.7" data-night="#2B3565">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 170 C 140 130, 230 190, 360 160 S 560 90, 680 140 S 880 200, 1000 150 S 1200 110, 1310 160 L 1440 150 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="fog f2" data-drift="24"></div>
+  </div>
+  <div class="ridge r4" data-rise="32" data-grow="0.1" data-peak="0.9" data-night="#1F2851">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 150 C 110 110, 250 170, 380 140 S 600 190, 740 130 S 930 80, 1060 140 S 1300 180, 1440 120 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="fog f3" data-drift="-30"></div>
+  </div>
+  <div class="ridge r5" data-rise="36" data-grow="0.08" data-peak="0.4" data-night="#141A38">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 120 C 160 80, 300 150, 470 120 S 760 70, 900 130 S 1150 170, 1290 110 L 1440 90 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="lights" id="lights"><span class="home"><b></b>Studio IX</span></div>
+  </div>
+
+  <div class="fireflies" id="fireflies"></div>
+
+  <svg class="grain">
+    <filter id="grain-f"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#grain-f)"/>
+  </svg>
+</div>
+
+<div class="survey" id="survey" aria-hidden="true">
+  <span data-tick="78.52° W"></span>
+  <span data-tick="78.50° W"></span>
+  <span data-tick="78.48° W"></span>
+  <span data-tick="78.46° W"></span>
+  <span data-tick="78.44° W"></span>
+  <span data-tick="78.42° W"></span>
+</div>
+
+<div class="alt" aria-hidden="true">
+  <span class="end"><b>Humpback Rocks</b>3,080 ft</span>
+  <div class="track">
+    <span class="bob" id="bob"><i></i><span class="read"><span id="elev">3,080</span><small>ft</small></span></span>
+  </div>
+  <span class="end"><b>Charlottesville</b>594 ft</span>
+</div>
+
+<div class="page">
+  <header class="hero" id="top">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="#top">
+        <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 19 L10 12 L13 15 L18 8 L24 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="18" cy="8" r="1.8" fill="#F2A93B"/></svg>
+        Cville AI Explorers
+      </a>
+      <ul>
+        <li><a class="pill" href="#about">About</a></li>
+        <li><a class="pill" href="#mission">Mission</a></li>
+        <li><a class="pill" href="#join">Join us</a></li>
+        <li><a class="pill" href="#contact">Contact</a></li>
+        <li><a class="pill solid" href="https://www.meetup.com/cville-tech/">Meetup</a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-body">
+      <p class="coords" id="coords"><span>38.0293° N</span><span>78.4767° W</span></p>
+      <h1 class="display"><span class="l1">Cville AI</span><span class="l2">Explorers</span></h1>
+      <p class="tagline" id="tagline">Building with AI in Charlottesville, Virginia</p>
+    </div>
+
+    <a class="marker" id="next-meetup"
+       data-date="2026-07-28"
+       data-event="https://www.meetup.com/cville-tech/events/315584929/"
+       data-group="https://www.meetup.com/cville-tech/"
+       href="https://www.meetup.com/cville-tech/events/315584929/">
+      <span class="pin" aria-hidden="true"></span>
+      <span class="card">
+        <span class="label">Next Meetup</span>
+        <span class="when" id="meetup-when">July 28, 2026</span>
+        <span class="sub" id="meetup-sub">See the event on Meetup</span>
+      </span>
+    </a>
+  </header>
+
+  <main>
+    <section class="section" id="about">
+      <h2 class="display">About Us</h2>
+      <div class="body">
+        <p class="lead intro">We are a group of builders, learners, and enthusiasts who gather to:</p>
+        <ul class="waypoints">
+          <li>Build practical AI applications and tools</li>
+          <li>Share technical knowledge and implementation experiences</li>
+          <li>Learn about and explore emerging AI technologies</li>
+          <li>Discover ways to enhance productivity and creativity</li>
+          <li>Support each other in creating AI-powered solutions</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="mission">
+      <h2 class="display">Our Mission</h2>
+      <div class="body">
+        <p class="lead">Our mission is to foster a community where people can develop AI building skills through hands-on projects, technical sharing, and collaborative learning, and discover practical ways to integrate AI tools into their work and daily lives. While our focus is on active building and implementation, we welcome anyone interested in learning these skills.</p>
+      </div>
+    </section>
+
+    <section class="section" id="activities">
+      <h2 class="display">Activities and Directions</h2>
+      <div class="body">
+        <ul class="activities">
+          <li>Exploring modern AI platforms and workflow tools</li>
+          <li>Technical demos and talks from AI builders</li>
+          <li>Technical book discussions and learning circles</li>
+          <li>Collaborative building sessions and group projects</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="join">
+      <h2 class="display">Join Us</h2>
+      <div class="body">
+        <p class="lead">Whether you're actively building AI applications or eager to learn how, there's a place for you in our community. We emphasize practical skills and implementation while maintaining an inclusive environment for learning.</p>
+        <h3>Get Involved</h3>
+        <ul class="waypoints">
+          <li>Attend our meetups</li>
+          <li>Share your AI experiences</li>
+          <li>Collaborate with other members</li>
+          <li>Present your projects or findings</li>
+          <li>Learn from peers</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <h2 class="display">Contact</h2>
+      <div class="body">
+        <p>Cville AI Explorers operates under the <a href="https://www.meetup.com/cville-tech/">Charlottesville Technologists meetup</a>. Contact organizers in the <a href="https://cville.slack.com/archives/C08DTL1TS1K">#cvilleaiexplorers</a> channel on <a href="https://cville.slack.com">Cville Slack</a>.</p>
+        <div class="contact-links">
+          <a class="btn" href="https://www.meetup.com/cville-tech/">Charlottesville Technologists on Meetup</a>
+          <a class="btn" href="https://cville.slack.com/archives/C08DTL1TS1K">#cvilleaiexplorers on Slack</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sponsors">
+      <h2 class="display">Our Sponsors</h2>
+      <div class="body">
+        <a class="sponsor-plate" href="https://www.studioix.co/"><img src="../../STUDIO_IX_Logo_White.jpg" alt="Studio IX"></a>
+        <p class="lead">Studio IX is a coworking space in downtown Charlottesville, Virginia, designed for freelancers, entrepreneurs, and remote workers.</p>
+        <details>
+          <summary>Learn More</summary>
+          <p>Studio IX offers a flexible shared office environment with options for open workspaces, dedicated desks, and private offices. The space fosters a collaborative community through weekly events and mixers, featuring a 'warm industrial' atmosphere with ample natural light.</p>
+          <p>Amenities include high-speed internet, soundproof phone booths, conference rooms, and premium coffee. Studio IX is staffed by a community manager on weekdays and provides 24/7 access for members.</p>
+          <p>Tours of the space are available; interested individuals can contact them via:</p>
+          <ul class="tour">
+            <li>Email: <a href="mailto:COWORK@STUDIOIX.CO">COWORK@STUDIOIX.CO</a></li>
+            <li>Phone: <a href="tel:+14342603803">434.260.3803</a></li>
+            <li>Website: <a href="https://www.studioix.co/">https://www.studioix.co/</a></li>
+          </ul>
+        </details>
+      </div>
+    </section>
+
+    <section class="section" id="conduct">
+      <h2 class="display">Code of Conduct</h2>
+      <div class="body">
+        <p>Cville AI Explorers follows the <a href="https://github.com/cville/conduct">Cville Slack Code of Conduct</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p class="f-name display">Cville AI Explorers</p>
+    <p class="f-tag">Building with AI in Charlottesville, Virginia</p>
+    <nav aria-label="Footer">
+      <a class="pill" href="https://www.meetup.com/cville-tech/">Meetup</a>
+      <a class="pill" href="https://github.com/cvilleaiexplorers">GitHub</a>
+    </nav>
+    <p class="copy"><span>© 2026 Cville AI Explorers. All rights reserved.</span><span>38.0293° N, 78.4767° W, elevation 594 ft</span></p>
+  </footer>
+</div>
+
+<script>
+  // Next meetup: dated link until the day passes, then TBA pointing at the group page.
+  // ?date=YYYY-MM-DD overrides the meetup date for previewing.
+  (function () {
+    var el = document.getElementById('next-meetup');
+    var override = new URLSearchParams(location.search).get('date');
+    var iso = /^\d{4}-\d{2}-\d{2}$/.test(override || '') ? override : el.dataset.date;
+    var p = iso.split('-').map(Number);
+    var endOfDay = new Date(p[0], p[1] - 1, p[2], 23, 59, 59);
+    var when = document.getElementById('meetup-when');
+    var sub = document.getElementById('meetup-sub');
+    if (Date.now() > endOfDay.getTime()) {
+      el.dataset.state = 'tba';
+      el.href = el.dataset.group;
+      when.textContent = 'TBA';
+      sub.textContent = 'Check Meetup Page';
+    } else {
+      el.dataset.state = 'dated';
+      el.href = el.dataset.event;
+      when.textContent = new Date(p[0], p[1] - 1, p[2]).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      sub.textContent = 'See the event on Meetup';
+    }
+  })();
+
+  // The descent. One scroll progress value drives the whole scene.
+  (function () {
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var TOP = 3080, BOTTOM = 594; // Humpback Rocks to Charlottesville, in feet
+
+    // Seeded scatter so stars and lights land in the same place every visit.
+    var seed = 7;
+    function rand() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+
+    var stars = document.getElementById('stars');
+    for (var i = 0; i < 70; i++) {
+      var s = document.createElement('i');
+      if (rand() > 0.88) s.className = 'b';
+      s.style.left = (rand() * 100).toFixed(2) + '%';
+      s.style.top = (rand() * 100).toFixed(2) + '%';
+      s.style.opacity = (0.35 + rand() * 0.65).toFixed(2);
+      stars.appendChild(s);
+    }
+    var lights = document.getElementById('lights');
+    for (var j = 0; j < 60; j++) {
+      var l = document.createElement('i');
+      // Denser toward the middle of the valley, like a town seen from the hills.
+      var x = 50 + (rand() + rand() + rand() - 1.5) * 52;
+      l.style.left = x.toFixed(2) + '%';
+      l.style.top = (8 + rand() * 80).toFixed(2) + '%';
+      l.style.opacity = (0.5 + rand() * 0.5).toFixed(2);
+      lights.appendChild(l);
+    }
+
+    var flies = document.getElementById('fireflies');
+    for (var f = 0; f < 26; f++) {
+      var fly = document.createElement('i');
+      fly.style.left = (4 + rand() * 92).toFixed(2) + '%';
+      fly.style.top = (10 + rand() * 85).toFixed(2) + '%';
+      fly.style.setProperty('--t', (3 + rand() * 4).toFixed(2) + 's');
+      fly.style.setProperty('--d', (-rand() * 6).toFixed(2) + 's');
+      fly.style.setProperty('--w', (7 + rand() * 8).toFixed(2) + 's');
+      fly.style.setProperty('--x', ((rand() - 0.5) * 80).toFixed(0) + 'px');
+      fly.style.setProperty('--y', (-10 - rand() * 50).toFixed(0) + 'px');
+      flies.appendChild(fly);
+    }
+
+    // Split section headings into words for the Atlas-style drift.
+    var heads = Array.prototype.map.call(document.querySelectorAll('.section h2'), function (h) {
+      var words = h.textContent.trim().split(/\s+/);
+      h.setAttribute('aria-label', h.textContent.trim());
+      h.textContent = '';
+      var spans = words.map(function (w, k) {
+        var span = document.createElement('span');
+        span.className = 'w';
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = w;
+        if (k) h.appendChild(document.createTextNode(' '));
+        h.appendChild(span);
+        return span;
+      });
+      return { el: h, words: spans };
+    });
+
+    var ridges = Array.prototype.map.call(document.querySelectorAll('.ridge'), function (r) {
+      return { el: r, svg: r.querySelector('svg'), rise: +r.dataset.rise, grow: +r.dataset.grow, peak: +r.dataset.peak, from: hex(getComputedStyle(r).getPropertyValue('--c')), to: hex(r.dataset.night) };
+    });
+    var fogs = Array.prototype.map.call(document.querySelectorAll('.fog'), function (f) { return { el: f, drift: +f.dataset.drift }; });
+    var sun = document.getElementById('sun');
+    var skyBlue = document.getElementById('sky-blue');
+    var skyNight = document.getElementById('sky-night');
+    var bob = document.getElementById('bob');
+    var alt = document.querySelector('.alt');
+    var elev = document.getElementById('elev');
+    var l1 = document.querySelector('h1 .l1');
+    var l2 = document.querySelector('h1 .l2');
+    var coords = document.getElementById('coords');
+    var tagline = document.getElementById('tagline');
+    var survey = document.getElementById('survey');
+    var narrow = window.matchMedia('(max-width: 860px)');
+
+    function hex(h) { h = h.trim().replace('#', ''); return [0, 2, 4].map(function (k) { return parseInt(h.substr(k, 2), 16); }); }
+    function mix(a, b, t) { return 'rgb(' + a.map(function (v, k) { return Math.round(v + (b[k] - v) * t); }).join(',') + ')'; }
+    function ramp(p, a, b) { return Math.min(1, Math.max(0, (p - a) / (b - a))); }
+    function ease(t) { return 1 - Math.pow(1 - t, 2); }
+
+    // The scene trails the scroll slightly, like a camera on a slow dolly.
+    var shown = null, ticking = false;
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight;
+      var max = Math.max(1, document.documentElement.scrollHeight - vh);
+      var y = window.scrollY;
+      var target = Math.min(1, Math.max(0, y / max));
+      if (shown === null || still) shown = target;
+      else shown += (target - shown) * 0.09;
+      if (Math.abs(target - shown) < 0.0004) shown = target;
+      else request();
+      var p = shown;
+      var e = ease(p);
+
+      // Sunset
+      sun.style.opacity = (1 - ramp(p, 0.22, 0.42)).toFixed(3);
+      if (!still) sun.style.transform = 'translate3d(0,' + (ease(ramp(p, 0, 0.4)) * 34).toFixed(2) + 'svh,0)';
+
+      // Time of day
+      skyBlue.style.opacity = ramp(p, 0.06, 0.32);
+      skyNight.style.opacity = ramp(p, 0.35, 0.7);
+      stars.style.opacity = ramp(p, 0.45, 0.8);
+      lights.style.opacity = ramp(p, 0.72, 0.92);
+      flies.style.opacity = ramp(p, 0.8, 0.97);
+
+      // Ridges darken with nightfall and, unless motion is reduced, rise as we descend
+      var dark = ramp(p, 0.04, 0.6);
+      ridges.forEach(function (r) {
+        r.el.style.setProperty('--c', mix(r.from, r.to, dark));
+        if (!still) {
+          r.el.style.transform = 'translate3d(0,' + (-r.rise * e).toFixed(2) + 'svh,0) scale(' + (1 + r.grow * e).toFixed(4) + ')';
+          // Peaks loom taller the lower we get
+          r.svg.style.transform = 'scaleY(' + (1 + r.peak * e).toFixed(4) + ')';
+        }
+      });
+
+      // Haze gathers in the hollows mid-descent, then clears for the night sky
+      var haze = ramp(p, 0.04, 0.2) * (1 - ramp(p, 0.55, 0.8));
+      fogs.forEach(function (f) {
+        f.el.style.opacity = haze.toFixed(3);
+        if (!still) f.el.style.transform = 'translate3d(' + (f.drift * p).toFixed(2) + 'vw,0,0)';
+      });
+
+      // Altimeter
+      var ft = p > 0.998 ? BOTTOM : Math.round((TOP - (TOP - BOTTOM) * p) / 10) * 10;
+      alt.style.opacity = (1 - ramp(p, 0.9, 0.98)).toFixed(3);
+      elev.textContent = ft.toLocaleString('en-US');
+      if (!narrow.matches) bob.style.top = (p * 100).toFixed(2) + '%';
+
+      // Hero headline parts drift apart as we leave the crest
+      var ph = Math.min(1, y / (vh * 0.9));
+      if (!still) {
+        l1.style.transform = 'translate3d(' + (-ph * 22).toFixed(2) + 'vw,0,0)';
+        l2.style.transform = 'translate3d(' + (ph * 22).toFixed(2) + 'vw,0,0)';
+      }
+      l1.style.opacity = l2.style.opacity = (1 - ph * 0.9).toFixed(3);
+      coords.style.opacity = tagline.style.opacity = (1 - ph * 1.4).toFixed(3);
+      survey.style.setProperty('--ticks', (1 - ph).toFixed(3));
+
+      // Section headings converge as they reach the middle of the view, then drift on
+      if (!still) heads.forEach(function (h) {
+        var r = h.el.getBoundingClientRect();
+        if (r.bottom < -vh || r.top > vh * 2) return;
+        var d = ((r.top + r.height / 2) - vh * 0.42) / vh;
+        d = d > 0 ? Math.min(d, 1) : Math.max(d, -1) * 0.45;
+        var n = h.words.length;
+        h.words.forEach(function (w, k) {
+          var dir = n === 1 ? 1 : (k < n / 2 ? -1 : 1);
+          w.style.transform = 'translate3d(' + (dir * d * 16).toFixed(2) + 'vw,0,0)';
+        });
+      });
+    }
+
+    function request() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    narrow.addEventListener('change', function () { bob.style.top = ''; request(); });
+    update();
+  })();
+</script>
+</body>
+</html>

@@ -54,3 +54,4 @@ teams/<team-slug>/
 | [Claude Code + Impeccable](teams/lane-c-claude-impeccable/) | Mike P. | C | Claude Code (Opus 5.5) + Impeccable |
 | [Claude Code + OpenCode native](teams/lane-c-claude-opencode-native/) | Eugene G. and Travis E. | C | Claude Code (Opus 5.5) and OpenCode, no design skill |
 | [ChatGPT Images + Claude Code](teams/lane-d-chatgpt-claude/) | Jill H. and Nish T. | D | ChatGPT (image generation), then Claude Code (Opus 5.5) |
+| [Claude Code + Mobbin](teams/lane-d-claude-mobbin/) | John A. | D | Claude Code with the Mobbin MCP server, no design skill |

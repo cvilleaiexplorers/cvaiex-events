@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cville AI Explorers</title>
+<meta name="description" content="Building with AI in Charlottesville, Virginia">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='14' fill='%232A3259'/%3E%3Cpath d='M4 19 L10 12 L13 15 L18 8 L24 19' fill='none' stroke='%23FFF6E8' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='18' cy='8' r='2.2' fill='%23F2A93B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-top: #7C8FB8;
+    --sky-glow: #F6C9A0;
+    --ridge-1: #8C98C2;
+    --ridge-2: #6674A3;
+    --ridge-3: #4F5F8F;
+    --ridge-4: #3B4674;
+    --ridge-5: #2A3259;
+    --warm: #FFF6E8;
+    --marigold: #F2A93B;
+    --haze: #E6E9F3;
+    --ink: #232A4D;
+    --ink-soft: #4A5178;
+    --rule: rgba(35, 42, 77, 0.18);
+    --gutter: clamp(16px, 4vw, 56px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--haze);
+    color: var(--ink);
+    font-family: "Archivo", system-ui, sans-serif;
+    font-variation-settings: "wdth" 100;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; }
+  :focus-visible {
+    outline: 3px solid var(--marigold);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .display {
+    font-variation-settings: "wdth" 125;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.92;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    color: var(--warm);
+    background: linear-gradient(180deg, var(--sky-top) 0%, #9AA3C4 38%, #D9B8B0 62%, var(--sky-glow) 78%, var(--sky-glow) 100%);
+    overflow: hidden;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sky-wash {
+    position: absolute; inset: 0; z-index: -3;
+    background:
+      radial-gradient(60% 40% at 72% 70%, rgba(255, 214, 170, 0.75), transparent 70%),
+      radial-gradient(40% 30% at 18% 22%, rgba(255, 236, 220, 0.28), transparent 70%),
+      radial-gradient(50% 24% at 40% 30%, rgba(246, 201, 160, 0.25), transparent 70%);
+  }
+
+  .grain {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    width: 100%; height: 100%;
+    opacity: 0.22; mix-blend-mode: overlay;
+  }
+
+  .ridges { position: absolute; inset: 0; z-index: -2; pointer-events: none; }
+  .ridge {
+    position: absolute; left: -2%; width: 104%; bottom: 0;
+    will-change: transform;
+  }
+  .ridge svg { display: block; width: 100%; height: 100%; }
+  .ridge.r1 { height: 62%; }
+  .ridge.r2 { height: 52%; }
+  .ridge.r3 { height: 42%; }
+  .ridge.r4 { height: 31%; }
+  .ridge.r5 { height: 20%; }
+
+  .survey {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    padding-inline: var(--gutter);
+  }
+  .survey span {
+    border-left: 1px solid rgba(255, 246, 232, 0.28);
+    position: relative;
+  }
+  .survey span:last-child { border-right: 1px solid rgba(255, 246, 232, 0.28); }
+  .survey span::after {
+    content: attr(data-tick);
+    position: absolute; left: 8px; bottom: 18px;
+    font-size: 0.72rem; letter-spacing: 0.04em;
+    color: rgba(255, 246, 232, 0.72);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nav {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 20px var(--gutter);
+    position: relative; z-index: 4;
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none;
+    font-variation-settings: "wdth" 125; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.9rem;
+  }
+  .brand svg { width: 28px; height: 28px; }
+  .nav ul { list-style: none; display: flex; gap: 8px; margin: 0; padding: 0; flex-wrap: wrap; }
+  .pill {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid rgba(255, 246, 232, 0.8);
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    transition: background-color .2s, color .2s;
+  }
+  .pill:hover { background: var(--warm); color: var(--ink); }
+  .pill.solid { background: var(--warm); color: var(--ink); border-color: var(--warm); }
+  .pill.solid:hover { background: var(--marigold); border-color: var(--marigold); }
+
+  .hero-body {
+    position: relative; z-index: 4;
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    align-content: center;
+    padding: 4vh var(--gutter) 30vh;
+    row-gap: 12px;
+  }
+  .coords {
+    grid-column: 1 / -1;
+    font-size: 0.85rem; letter-spacing: 0.06em;
+    color: rgba(255, 246, 232, 0.9);
+    margin: 0 0 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .coords span + span { margin-left: 1.2em; }
+  h1 { margin: 0; grid-column: 1 / -1; font-size: clamp(2.6rem, 9.2vw, 9rem); text-shadow: 0 2px 30px rgba(42, 50, 89, 0.25); }
+  h1 .l1 { display: block; padding-left: calc(100% / 6 * 1); }
+  h1 .l2 { display: block; padding-left: calc(100% / 6 * 0); }
+  .tagline {
+    grid-column: 4 / -1;
+    margin: 18px 0 0;
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+    font-weight: 600;
+    line-height: 1.35;
+    max-width: 22ch;
+    text-shadow: 0 1px 2px rgba(42, 50, 89, 0.55), 0 2px 18px rgba(42, 50, 89, 0.5);
+  }
+
+  /* Destination marker */
+  .marker {
+    position: absolute; z-index: 4;
+    right: calc(var(--gutter) + 100% / 6 * 0.6);
+    bottom: 12vh;
+    display: flex; align-items: flex-end; gap: 14px;
+    text-decoration: none;
+    color: var(--warm);
+  }
+  .marker .pin {
+    position: relative; width: 22px; height: 22px; flex: none;
+    border-radius: 50%;
+    background: var(--marigold);
+    box-shadow: 0 0 0 6px rgba(242, 169, 59, 0.28), 0 0 0 14px rgba(242, 169, 59, 0.12);
+    margin-bottom: 8px;
+  }
+  .marker .pin::before {
+    content: ""; position: absolute; left: 50%; top: 100%;
+    width: 1px; height: 12vh; background: rgba(255, 246, 232, 0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .marker .pin::after {
+      content: ""; position: absolute; inset: -6px; border-radius: 50%;
+      border: 2px solid var(--marigold);
+      animation: ping 2.6s ease-out infinite;
+    }
+    @keyframes ping { from { transform: scale(0.6); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
+  }
+  .marker .card {
+    background: var(--ridge-5);
+    border: 1px solid rgba(242, 169, 59, 0.55);
+    padding: 14px 18px 16px;
+    border-radius: 4px 18px 18px 18px;
+    min-width: 220px;
+    transition: transform .2s, border-color .2s;
+  }
+  .marker:hover .card { transform: translateY(-3px); border-color: var(--marigold); }
+  .marker .label { display: block; font-size: 0.9rem; color: var(--marigold); font-weight: 700; }
+  .marker .when {
+    display: block;
+    font-variation-settings: "wdth" 125; font-weight: 800;
+    font-size: clamp(1.4rem, 2.4vw, 2rem); line-height: 1.05;
+    text-transform: uppercase; margin-top: 4px;
+  }
+  .marker .sub { display: block; font-size: 0.9rem; margin-top: 6px; color: rgba(255, 246, 232, 0.82); text-decoration: underline; text-underline-offset: 3px; }
+  .marker[data-state="tba"] .card { border-style: dashed; }
+  .marker[data-state="tba"] .pin { background: transparent; border: 3px solid var(--marigold); }
+
+  /* ---------- Content ---------- */
+  main { position: relative; }
+  .section {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    column-gap: 24px;
+    padding: clamp(56px, 9vw, 120px) var(--gutter);
+    border-top: 1px solid var(--rule);
+  }
+  .section:first-child { border-top: 0; }
+  .section h2 {
+    grid-column: 1 / 3;
+    margin: 0 0 24px;
+    font-size: clamp(1.9rem, 3.6vw, 3.2rem);
+    color: var(--ink);
+  }
+  .section .body { grid-column: 3 / -1; max-width: 68ch; }
+  .section .body > p:first-child { margin-top: 0; }
+  .lead { font-size: clamp(1.25rem, 1.9vw, 1.6rem); line-height: 1.45; }
+
+  .waypoints { list-style: none; margin: 0; padding: 0; }
+  .waypoints li {
+    position: relative;
+    padding: 14px 0 14px 40px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .waypoints li:first-child { border-top: 1px solid var(--rule); }
+  .waypoints li::before {
+    content: "";
+    position: absolute; left: 4px; top: 50%;
+    width: 20px; height: 10px; transform: translateY(-50%);
+    background: var(--ridge-3);
+    clip-path: polygon(0 100%, 30% 20%, 48% 60%, 70% 0, 100% 100%);
+  }
+  .intro { margin: 0 0 18px; }
+
+  .activities {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 0;
+  }
+  .activities li {
+    padding: 22px 24px 22px 0;
+    border-top: 2px solid var(--ink);
+    font-size: 1.2rem; line-height: 1.35;
+    font-weight: 500;
+  }
+  .activities li:nth-child(odd) { padding-right: 32px; }
+
+  .join { background: var(--ridge-4); color: var(--warm); border-top: 0; }
+  .join h2, .join h3 { color: var(--warm); }
+  .join h3 {
+    font-variation-settings: "wdth" 125; font-weight: 800; text-transform: uppercase;
+    font-size: 1.1rem; letter-spacing: 0.02em; margin: 36px 0 12px;
+  }
+  .join .waypoints li { border-color: rgba(255, 246, 232, 0.2); }
+  .join .waypoints li::before { background: var(--marigold); }
+
+  .contact-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  .btn {
+    display: inline-block; padding: 10px 20px; border-radius: 999px;
+    border: 1.5px solid var(--ink); text-decoration: none; font-weight: 600;
+    transition: background-color .2s, color .2s;
+  }
+  .btn:hover { background: var(--ink); color: var(--haze); }
+
+  .sponsor { background: var(--ridge-5); color: var(--warm); border-top: 0; }
+  .sponsor h2 { color: var(--warm); }
+  .sponsor-plate {
+    display: inline-block; background: var(--warm); padding: 14px 18px; border-radius: 4px 18px 18px 18px;
+    margin-bottom: 20px;
+  }
+  .sponsor-plate img { display: block; width: 220px; max-width: 100%; height: auto; mix-blend-mode: multiply; }
+  details {
+    margin-top: 20px;
+    border-top: 1px solid rgba(255, 246, 232, 0.25);
+    border-bottom: 1px solid rgba(255, 246, 232, 0.25);
+  }
+  summary {
+    cursor: pointer; padding: 14px 0; font-weight: 700; color: var(--marigold);
+    list-style: none; display: flex; align-items: center; gap: 10px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "+"; display: inline-grid; place-items: center;
+    width: 22px; height: 22px; border: 1.5px solid var(--marigold); border-radius: 50%;
+    font-size: 1rem; line-height: 1;
+  }
+  details[open] summary::before { content: "−"; }
+  .tour { list-style: none; padding: 0; margin: 12px 0 20px; display: grid; gap: 6px; }
+  .tour a { color: var(--warm); text-underline-offset: 3px; }
+  .sponsor .body a { color: var(--warm); }
+
+  footer {
+    background: #1D2342; color: var(--warm);
+    padding: 48px var(--gutter) 36px;
+    display: grid; grid-template-columns: repeat(6, 1fr); column-gap: 24px; row-gap: 20px;
+    position: relative; overflow: hidden;
+  }
+  footer .f-name { grid-column: 1 / 4; margin: 0; font-size: clamp(1.5rem, 3vw, 2.2rem); }
+  footer .f-tag { grid-column: 1 / 4; margin: 0; color: rgba(255, 246, 232, 0.8); }
+  footer nav { grid-column: 4 / -1; grid-row: 1 / 3; display: flex; gap: 10px; justify-content: flex-end; align-items: flex-start; flex-wrap: wrap; }
+  footer .copy { grid-column: 1 / -1; margin: 24px 0 0; font-size: 0.85rem; color: rgba(255, 246, 232, 0.65); border-top: 1px solid rgba(255, 246, 232, 0.15); padding-top: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px) {
+    .section h2, .section .body { grid-column: 1 / -1; }
+    .tagline { grid-column: 2 / -1; }
+    footer .f-name, footer .f-tag, footer nav { grid-column: 1 / -1; grid-row: auto; justify-content: flex-start; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 1.0625rem; }
+    .nav { flex-direction: column; align-items: flex-start; }
+    .survey { grid-template-columns: repeat(3, 1fr); }
+    .survey span:nth-child(n+4) { display: none; }
+    .survey span:nth-child(3) { border-right: 1px solid rgba(255, 246, 232, 0.28); }
+    h1 { font-size: clamp(2.2rem, 11.5vw, 3.4rem); }
+    h1 .l1 { padding-left: 0; }
+    .tagline { grid-column: 1 / -1; }
+    .hero-body { padding-bottom: 8vh; align-content: start; padding-top: 6vh; }
+    .marker { position: relative; right: auto; bottom: auto; margin: 0 var(--gutter) 22vh; align-self: flex-start; }
+    .marker .pin::before { display: none; }
+    .activities { grid-template-columns: 1fr; }
+    .nav li:nth-child(2), .nav li:nth-child(4) { display: none; }
+    .marker .pin { margin-left: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero" id="top">
+  <div class="sky-wash"></div>
+
+  <div class="survey" aria-hidden="true">
+    <span data-tick="78.52° W"></span>
+    <span data-tick="78.50° W"></span>
+    <span data-tick="78.48° W"></span>
+    <span data-tick="78.46° W"></span>
+    <span data-tick="78.44° W"></span>
+    <span data-tick="78.42° W"></span>
+  </div>
+
+  <div class="ridges" aria-hidden="true">
+    <div class="ridge r1" data-depth="0.32">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#8C98C2" fill-opacity="0.7" d="M0 210 C 90 170, 160 150, 250 175 S 420 120, 520 140 S 700 90, 820 125 S 1000 150, 1090 110 S 1280 80, 1360 120 L 1440 130 L 1440 400 L 0 400 Z"/></svg>
+    </div>
+    <div class="ridge r2" data-depth="0.24">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#6674A3" fill-opacity="0.85" d="M0 190 C 120 150, 200 175, 300 150 S 470 110, 590 160 S 760 190, 880 140 S 1060 90, 1170 150 S 1340 170, 1440 140 L 1440 400 L 0 400 Z"/></svg>
+    </div>
+    <div class="ridge r3" data-depth="0.16">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#4F5F8F" d="M0 170 C 140 130, 230 190, 360 160 S 560 90, 680 140 S 880 200, 1000 150 S 1200 110, 1310 160 L 1440 150 L 1440 400 L 0 400 Z"/></svg>
+    </div>
+    <div class="ridge r4" data-depth="0.08">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#3B4674" d="M0 150 C 110 110, 250 170, 380 140 S 600 190, 740 130 S 930 80, 1060 140 S 1300 180, 1440 120 L 1440 400 L 0 400 Z"/></svg>
+    </div>
+    <div class="ridge r5" data-depth="0.02">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#2A3259" d="M0 120 C 160 80, 300 150, 470 120 S 760 70, 900 130 S 1150 170, 1290 110 L 1440 90 L 1440 400 L 0 400 Z"/></svg>
+    </div>
+  </div>
+
+  <svg class="grain" aria-hidden="true">
+    <filter id="grain-f"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#grain-f)"/>
+  </svg>
+
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 19 L10 12 L13 15 L18 8 L24 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="18" cy="8" r="1.8" fill="#F2A93B"/></svg>
+      Cville AI Explorers
+    </a>
+    <ul>
+      <li><a class="pill" href="#about">About</a></li>
+      <li><a class="pill" href="#mission">Mission</a></li>
+      <li><a class="pill" href="#join">Join us</a></li>
+      <li><a class="pill" href="#contact">Contact</a></li>
+      <li><a class="pill solid" href="https://www.meetup.com/cville-tech/">Meetup</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero-body">
+    <p class="coords"><span>38.0293° N</span><span>78.4767° W</span></p>
+    <h1 class="display"><span class="l1">Cville AI</span><span class="l2">Explorers</span></h1>
+    <p class="tagline">Building with AI in Charlottesville, Virginia</p>
+  </div>
+
+  <a class="marker" id="next-meetup"
+     data-date="2026-07-28"
+     data-event="https://www.meetup.com/cville-tech/events/315584929/"
+     data-group="https://www.meetup.com/cville-tech/"
+     href="https://www.meetup.com/cville-tech/events/315584929/">
+    <span class="pin" aria-hidden="true"></span>
+    <span class="card">
+      <span class="label">Next Meetup</span>
+      <span class="when" id="meetup-when">July 28, 2026</span>
+      <span class="sub" id="meetup-sub">See the event on Meetup</span>
+    </span>
+  </a>
+</header>
+
+<main>
+  <section class="section" id="about">
+    <h2 class="display">About Us</h2>
+    <div class="body">
+      <p class="lead intro">We are a group of builders, learners, and enthusiasts who gather to:</p>
+      <ul class="waypoints">
+        <li>Build practical AI applications and tools</li>
+        <li>Share technical knowledge and implementation experiences</li>
+        <li>Learn about and explore emerging AI technologies</li>
+        <li>Discover ways to enhance productivity and creativity</li>
+        <li>Support each other in creating AI-powered solutions</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="mission">
+    <h2 class="display">Our Mission</h2>
+    <div class="body">
+      <p class="lead">Our mission is to foster a community where people can develop AI building skills through hands-on projects, technical sharing, and collaborative learning, and discover practical ways to integrate AI tools into their work and daily lives. While our focus is on active building and implementation, we welcome anyone interested in learning these skills.</p>
+    </div>
+  </section>
+
+  <section class="section" id="activities">
+    <h2 class="display">Activities and Directions</h2>
+    <div class="body">
+      <ul class="activities">
+        <li>Exploring modern AI platforms and workflow tools</li>
+        <li>Technical demos and talks from AI builders</li>
+        <li>Technical book discussions and learning circles</li>
+        <li>Collaborative building sessions and group projects</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section join" id="join">
+    <h2 class="display">Join Us</h2>
+    <div class="body">
+      <p class="lead">Whether you're actively building AI applications or eager to learn how, there's a place for you in our community. We emphasize practical skills and implementation while maintaining an inclusive environment for learning.</p>
+      <h3>Get Involved</h3>
+      <ul class="waypoints">
+        <li>Attend our meetups</li>
+        <li>Share your AI experiences</li>
+        <li>Collaborate with other members</li>
+        <li>Present your projects or findings</li>
+        <li>Learn from peers</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <h2 class="display">Contact</h2>
+    <div class="body">
+      <p>Cville AI Explorers operates under the <a href="https://www.meetup.com/cville-tech/">Charlottesville Technologists meetup</a>. Contact organizers in the <a href="https://cville.slack.com/archives/C08DTL1TS1K">#cvilleaiexplorers</a> channel on <a href="https://cville.slack.com">Cville Slack</a>.</p>
+      <div class="contact-links">
+        <a class="btn" href="https://www.meetup.com/cville-tech/">Charlottesville Technologists on Meetup</a>
+        <a class="btn" href="https://cville.slack.com/archives/C08DTL1TS1K">#cvilleaiexplorers on Slack</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sponsor" id="sponsors">
+    <h2 class="display">Our Sponsors</h2>
+    <div class="body">
+      <a class="sponsor-plate" href="https://www.studioix.co/"><img src="../../STUDIO_IX_Logo_White.jpg" alt="Studio IX"></a>
+      <p class="lead">Studio IX is a coworking space in downtown Charlottesville, Virginia, designed for freelancers, entrepreneurs, and remote workers.</p>
+      <details>
+        <summary>Learn More</summary>
+        <p>Studio IX offers a flexible shared office environment with options for open workspaces, dedicated desks, and private offices. The space fosters a collaborative community through weekly events and mixers, featuring a 'warm industrial' atmosphere with ample natural light.</p>
+        <p>Amenities include high-speed internet, soundproof phone booths, conference rooms, and premium coffee. Studio IX is staffed by a community manager on weekdays and provides 24/7 access for members.</p>
+        <p>Tours of the space are available; interested individuals can contact them via:</p>
+        <ul class="tour">
+          <li>Email: <a href="mailto:COWORK@STUDIOIX.CO">COWORK@STUDIOIX.CO</a></li>
+          <li>Phone: <a href="tel:+14342603803">434.260.3803</a></li>
+          <li>Website: <a href="https://www.studioix.co/">https://www.studioix.co/</a></li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <section class="section" id="conduct">
+    <h2 class="display">Code of Conduct</h2>
+    <div class="body">
+      <p>Cville AI Explorers follows the <a href="https://github.com/cville/conduct">Cville Slack Code of Conduct</a>.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p class="f-name display">Cville AI Explorers</p>
+  <p class="f-tag">Building with AI in Charlottesville, Virginia</p>
+  <nav aria-label="Footer">
+    <a class="pill" href="https://www.meetup.com/cville-tech/">Meetup</a>
+    <a class="pill" href="https://github.com/cvilleaiexplorers">GitHub</a>
+  </nav>
+  <p class="copy"><span>© 2026 Cville AI Explorers. All rights reserved.</span><span>38.0293° N, 78.4767° W</span></p>
+</footer>
+
+<script>
+  // Next meetup: dated link until the day passes, then TBA pointing at the group page.
+  // ?date=YYYY-MM-DD overrides the meetup date for previewing.
+  (function () {
+    var el = document.getElementById('next-meetup');
+    var override = new URLSearchParams(location.search).get('date');
+    var iso = /^\d{4}-\d{2}-\d{2}$/.test(override || '') ? override : el.dataset.date;
+    var p = iso.split('-').map(Number);
+    var endOfDay = new Date(p[0], p[1] - 1, p[2], 23, 59, 59);
+    var when = document.getElementById('meetup-when');
+    var sub = document.getElementById('meetup-sub');
+    if (Date.now() > endOfDay.getTime()) {
+      el.dataset.state = 'tba';
+      el.href = el.dataset.group;
+      when.textContent = 'TBA';
+      sub.textContent = 'Check Meetup Page';
+    } else {
+      el.dataset.state = 'dated';
+      el.href = el.dataset.event;
+      when.textContent = new Date(p[0], p[1] - 1, p[2]).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      sub.textContent = 'See the event on Meetup';
+    }
+  })();
+
+  // Ridge parallax, off for reduced motion.
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var ridges = Array.prototype.slice.call(document.querySelectorAll('.ridge'));
+    var ticking = false;
+    function update() {
+      var y = window.scrollY;
+      if (y < window.innerHeight * 1.2) {
+        ridges.forEach(function (r) {
+          r.style.transform = 'translate3d(0,' + (y * Number(r.dataset.depth)).toFixed(1) + 'px,0)';
+        });
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+  })();
+</script>
+</body>
+</html>

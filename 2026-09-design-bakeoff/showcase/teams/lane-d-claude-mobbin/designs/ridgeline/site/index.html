@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cville AI Explorers</title>
+<meta name="description" content="Building with AI in Charlottesville, Virginia">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='14' fill='%232A3259'/%3E%3Cpath d='M4 19 L10 12 L13 15 L18 8 L24 19' fill='none' stroke='%23FFF6E8' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='18' cy='8' r='2.2' fill='%23F2A93B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  /*
+    The page is one journey. It starts on the Blue Ridge crest at dusk
+    (Humpback Rocks, 3,080 ft), descends through the night to the town
+    lights of Charlottesville (594 ft), then steps inside: white walls,
+    warm wood and concrete, where the meetup actually happens.
+  */
+  :root {
+    --warm: #FFF6E8;
+    --warm-soft: rgba(255, 246, 232, 0.82);
+    --marigold: #F2A93B;
+    --ink: #232A4D;
+    --ink-soft: #4A5178;
+    --deep: #131936;
+    --wall: #F5F5F1;
+    --concrete: #DAD8D2;
+    --oak: #D4954E;
+    --rule: rgba(255, 246, 232, 0.2);
+    --rule-ink: rgba(35, 42, 77, 0.14);
+    --grid-ink: rgba(35, 42, 77, 0.07);
+    --gutter: clamp(16px, 4vw, 56px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--deep);
+    color: var(--warm);
+    font-family: "Archivo", system-ui, sans-serif;
+    font-variation-settings: "wdth" 100;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  a { color: inherit; }
+  img { display: block; max-width: 100%; }
+  :focus-visible { outline: 3px solid var(--marigold); outline-offset: 3px; border-radius: 4px; }
+
+  .display {
+    font-variation-settings: "wdth" 125;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.92;
+  }
+
+  /* ---------- The stage (fixed, behind everything) ---------- */
+  .stage { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .sky { position: absolute; inset: 0; }
+  .sky-dusk {
+    background:
+      radial-gradient(60% 40% at 72% 70%, rgba(255, 214, 170, 0.75), transparent 70%),
+      radial-gradient(40% 30% at 18% 22%, rgba(255, 236, 220, 0.28), transparent 70%),
+      linear-gradient(180deg, #7C8FB8 0%, #9AA3C4 38%, #D9B8B0 62%, #F6C9A0 78%, #F6C9A0 100%);
+  }
+  .sky-blue {
+    opacity: 0;
+    background:
+      radial-gradient(55% 30% at 70% 72%, rgba(233, 160, 130, 0.55), transparent 70%),
+      linear-gradient(180deg, #33427A 0%, #56598E 45%, #A9839C 72%, #D99A86 90%);
+  }
+  .sky-night { opacity: 0; background: linear-gradient(180deg, #111936 0%, #1A2450 50%, #2A3664 82%, #3A416E 100%); }
+
+  .sun {
+    position: absolute; left: 68%; top: 47svh;
+    width: clamp(56px, 9vmin, 110px); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 50% 45%, #FFF8EC 0%, #FFE9CC 60%, #FFD9AE 100%);
+    box-shadow: 0 0 60px 24px rgba(255, 214, 170, 0.55), 0 0 160px 80px rgba(255, 196, 150, 0.3);
+    will-change: transform, opacity;
+  }
+
+  .stars { position: absolute; left: 0; right: 0; top: 0; height: 48%; opacity: 0; }
+  .stars i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: var(--warm); }
+  .stars i.b { width: 3px; height: 3px; box-shadow: 0 0 6px rgba(255, 246, 232, 0.8); }
+
+  .ridge {
+    --under: 90svh;
+    position: absolute; left: -12%; width: 124%;
+    bottom: calc(-1 * var(--under));
+    height: calc(var(--h) + var(--under));
+    transform-origin: 50% 0;
+    will-change: transform;
+  }
+  .ridge svg { display: block; width: 100%; height: var(--h); transform-origin: 50% 100%; will-change: transform; overflow: visible; }
+  .ridge path { fill: var(--c); }
+  .ridge .fill { height: var(--under); background: var(--c); margin-top: -1px; }
+  .r1 { --h: 62svh; --c: #8C98C2; }
+  .r2 { --h: 52svh; --c: #6674A3; }
+  .r3 { --h: 42svh; --c: #4F5F8F; }
+  .r4 { --h: 31svh; --c: #3B4674; }
+  .r5 { --h: 20svh; --c: #2A3259; }
+
+  /* Blue Ridge haze, sitting in the hollows in front of each ridge */
+  .fog {
+    position: absolute; left: -20%; width: 140%; height: 30svh;
+    top: calc(var(--h) * 0.2);
+    opacity: 0;
+    background:
+      radial-gradient(30% 50% at 18% 55%, rgba(226, 231, 247, 0.7), transparent 70%),
+      radial-gradient(26% 42% at 46% 45%, rgba(226, 231, 247, 0.6), transparent 70%),
+      radial-gradient(34% 55% at 76% 60%, rgba(226, 231, 247, 0.65), transparent 70%);
+    will-change: transform, opacity;
+  }
+
+  .lights { position: absolute; left: 0; right: 0; top: 8svh; height: 15svh; opacity: 0; }
+  .lights i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #FFD9A0; box-shadow: 0 0 8px 1px rgba(255, 200, 120, 0.7); }
+  .lights .home {
+    position: absolute; left: 53%; top: 40%;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.8rem; font-weight: 700; color: var(--marigold); white-space: nowrap;
+  }
+  .lights .home b {
+    width: 9px; height: 9px; border-radius: 50%; background: var(--marigold);
+    box-shadow: 0 0 0 5px rgba(242, 169, 59, 0.25), 0 0 18px 4px rgba(242, 169, 59, 0.6);
+  }
+
+  .fireflies { position: absolute; left: 0; right: 0; bottom: 0; height: 42svh; opacity: 0; }
+  .fireflies i {
+    position: absolute; width: 4px; height: 4px; border-radius: 50%;
+    background: #EEF5A6; box-shadow: 0 0 10px 3px rgba(226, 240, 140, 0.55); opacity: 0.6;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .lights i:nth-child(3n) { animation: twinkle 3.4s ease-in-out infinite; }
+    .lights i:nth-child(5n) { animation: twinkle 4.8s ease-in-out infinite 1s; }
+    @keyframes twinkle { 50% { opacity: 0.35; } }
+    .fireflies i { animation: glow var(--t, 4s) ease-in-out infinite var(--d, 0s), wander var(--w, 9s) ease-in-out infinite alternate var(--d, 0s); }
+    @keyframes glow { 0%, 60%, 100% { opacity: 0.05; } 75% { opacity: 1; } }
+    @keyframes wander { to { transform: translate(var(--x, 20px), var(--y, -30px)); } }
+  }
+
+  .grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.2; mix-blend-mode: overlay; }
+
+  /* Survey grid, fixed over the scene for the whole journey */
+  .survey {
+    --grid: rgba(255, 246, 232, 0.2);
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    padding-inline: var(--gutter);
+  }
+  .survey span { border-left: 1px solid var(--grid); position: relative; }
+  .survey span:last-child { border-right: 1px solid var(--grid); }
+  .survey span::after {
+    content: attr(data-tick);
+    position: absolute; left: 8px; bottom: 14px;
+    font-size: 0.72rem; letter-spacing: 0.04em;
+    color: rgba(255, 246, 232, 0.6); font-variant-numeric: tabular-nums;
+    opacity: var(--ticks, 1);
+  }
+
+  /* Altimeter: a track in the right margin, reading carried on a small chip */
+  .alt {
+    position: fixed; z-index: 3; pointer-events: none;
+    right: max(10px, calc(var(--gutter) / 2 - 1px)); top: 18svh; bottom: 18svh;
+    display: flex; flex-direction: column; align-items: center;
+    font-size: 0.72rem; color: var(--warm-soft);
+  }
+  .alt .end { position: absolute; right: 12px; white-space: nowrap; text-align: right; line-height: 1.25; }
+  .alt .end:first-child { top: -6px; }
+  .alt .end:last-child { bottom: -6px; }
+  .alt .end b { display: block; color: var(--warm); font-weight: 700; }
+  .alt .track { position: relative; flex: 1; width: 1px; background: rgba(255, 246, 232, 0.4); }
+  .alt .bob { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); }
+  .alt .bob i { display: block; width: 11px; height: 11px; border-radius: 50%; background: var(--marigold); box-shadow: 0 0 0 4px rgba(242, 169, 59, 0.28); }
+  .alt .read {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    background: rgba(19, 25, 54, 0.85); border: 1px solid rgba(242, 169, 59, 0.5);
+    padding: 4px 10px; border-radius: 999px;
+    font-variation-settings: "wdth" 125; font-weight: 800; font-size: 0.9rem;
+    color: var(--warm); font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .alt .read small { font-size: 0.68rem; font-weight: 600; margin-left: 3px; }
+  /* End labels only where the margin is wide enough to hold them */
+  @media (max-width: 1500px) { .alt .end { display: none; } }
+
+  /* ---------- Content, composited on the scene ---------- */
+  .page { position: relative; z-index: 2; }
+
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 20px var(--gutter); flex-wrap: wrap; }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+    font-variation-settings: "wdth" 125; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.9rem;
+  }
+  .brand svg { width: 28px; height: 28px; }
+  .nav ul { list-style: none; display: flex; gap: 8px; margin: 0; padding: 0; flex-wrap: wrap; }
+  .pill {
+    display: inline-block; padding: 6px 14px;
+    border: 1px solid currentColor; border-radius: 999px;
+    text-decoration: none; font-size: 0.85rem; line-height: 1.2;
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  .pill:hover { background: var(--warm); color: var(--ink); border-color: var(--warm); }
+  .pill.solid { background: var(--warm); color: var(--ink); border-color: var(--warm); }
+  .pill.solid:hover { background: var(--marigold); border-color: var(--marigold); }
+
+  .hero-body { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); align-content: center; padding: 4vh var(--gutter) 30vh; row-gap: 12px; }
+  .coords { grid-column: 1 / -1; font-size: 0.85rem; letter-spacing: 0.06em; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
+  .coords span + span { margin-left: 1.2em; }
+  h1 { margin: 0; grid-column: 1 / -1; font-size: clamp(2.6rem, 9.2vw, 9rem); text-shadow: 0 2px 30px rgba(42, 50, 89, 0.25); }
+  h1 span { display: block; will-change: transform; }
+  h1 .l1 { padding-left: calc(100% / 6); }
+  .tagline {
+    grid-column: 4 / -1; margin: 18px 0 0;
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem); font-weight: 600; line-height: 1.35; max-width: 22ch;
+    text-shadow: 0 1px 2px rgba(42, 50, 89, 0.55), 0 2px 18px rgba(42, 50, 89, 0.5);
+  }
+
+  .marker { position: absolute; right: calc(var(--gutter) + 100% / 6 * 0.6); bottom: 12vh; display: flex; align-items: flex-end; gap: 14px; text-decoration: none; }
+  .marker .pin {
+    position: relative; width: 22px; height: 22px; flex: none; border-radius: 50%;
+    background: var(--marigold);
+    box-shadow: 0 0 0 6px rgba(242, 169, 59, 0.28), 0 0 0 14px rgba(242, 169, 59, 0.12);
+    margin-bottom: 8px;
+  }
+  .marker .pin::before { content: ""; position: absolute; left: 50%; top: 100%; width: 1px; height: 12vh; background: rgba(255, 246, 232, 0.6); }
+  @media (prefers-reduced-motion: no-preference) {
+    .marker .pin::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--marigold); animation: ping 2.6s ease-out infinite; }
+    @keyframes ping { from { transform: scale(0.6); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
+  }
+  .marker .card { background: var(--deep); border: 1px solid rgba(242, 169, 59, 0.55); padding: 14px 18px 16px; border-radius: 4px 18px 18px 18px; min-width: 220px; transition: transform .2s, border-color .2s; }
+  .marker:hover .card { transform: translateY(-3px); border-color: var(--marigold); }
+  .marker .label { display: block; font-size: 0.9rem; color: var(--marigold); font-weight: 700; }
+  .marker .when { display: block; font-variation-settings: "wdth" 125; font-weight: 800; font-size: clamp(1.4rem, 2.4vw, 2rem); line-height: 1.05; text-transform: uppercase; margin-top: 4px; }
+  .marker .sub { display: block; font-size: 0.9rem; margin-top: 6px; color: var(--warm-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .marker[data-state="tba"] .card { border-style: dashed; }
+  .marker[data-state="tba"] .pin { background: transparent; border: 3px solid var(--marigold); }
+
+  .section {
+    position: relative; isolation: isolate;
+    display: grid; grid-template-columns: repeat(6, 1fr); column-gap: 24px;
+    padding: 16vh var(--gutter);
+  }
+  /* On the night scene: a soft pool of shade behind the text, not a card */
+  .section.dark::before {
+    content: ""; position: absolute; z-index: -1; inset: 4vh 0;
+    background: radial-gradient(60% 55% at 45% 50%, rgba(17, 23, 52, 0.55), transparent 75%);
+  }
+  .section.dark { text-shadow: 0 1px 12px rgba(17, 23, 52, 0.55); }
+  .section h2 { grid-column: 1 / 6; margin: 0 0 32px; font-size: clamp(2.4rem, 7.4vw, 7rem); }
+  .section h2 .w { display: inline-block; will-change: transform, opacity; }
+  .section .body { grid-column: 3 / 6; max-width: 62ch; }
+  .section .body > p:first-child { margin-top: 0; }
+  .lead { font-size: clamp(1.25rem, 1.9vw, 1.6rem); line-height: 1.45; }
+
+  /* Indoors: a white wall that rises over the night as we arrive */
+  .indoors {
+    position: relative; background: var(--wall);
+    box-shadow: 0 -40px 80px rgba(10, 14, 32, 0.35);
+    border-top: 3px solid var(--marigold);
+  }
+  .indoors .grid-in {
+    position: absolute; inset: 0; pointer-events: none;
+    display: grid; grid-template-columns: repeat(6, 1fr); padding-inline: var(--gutter);
+  }
+  .indoors .grid-in span { border-left: 1px solid var(--grid-ink); }
+  .indoors .grid-in span:last-child { border-right: 1px solid var(--grid-ink); }
+  #activities { padding-bottom: 48vh; }
+  #about .bg-photo { left: -8%; top: 22%; width: 50%; height: 78%; --o: 0.4; }
+
+  /* Indoors: ink on white wall */
+  .section.lit { color: var(--ink); }
+  .section.lit a { color: var(--ink); text-decoration-color: var(--oak); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+  .waypoints { list-style: none; margin: 0; padding: 0; }
+  .waypoints li { position: relative; padding: 14px 0 14px 40px; border-bottom: 1px solid var(--rule); }
+  .waypoints li:first-child { border-top: 1px solid var(--rule); }
+  .waypoints li::before {
+    content: ""; position: absolute; left: 4px; top: 50%;
+    width: 20px; height: 10px; transform: translateY(-50%);
+    background: var(--marigold);
+    clip-path: polygon(0 100%, 30% 20%, 48% 60%, 70% 0, 100% 100%);
+  }
+  .lit .waypoints li { border-color: var(--rule-ink); }
+  .lit .waypoints li::before { background: var(--oak); }
+  .intro { margin: 0 0 18px; }
+
+  .activities { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); }
+  .activities li { padding: 22px 32px 22px 0; border-top: 2px solid var(--warm); font-size: 1.2rem; line-height: 1.35; font-weight: 500; }
+
+  .section h3 { font-variation-settings: "wdth" 125; font-weight: 800; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 0.02em; margin: 36px 0 12px; }
+
+  /* Photos: fade and settle in as they arrive */
+  .photo { margin: 0; overflow: hidden; border-radius: 4px; background: rgba(19, 25, 54, 0.3); }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .js .photo img { opacity: 0; transform: scale(1.06); transition: opacity 1.4s ease-out, transform 2.2s cubic-bezier(.2, .7, .2, 1); }
+  .js .photo.in img { opacity: 1; transform: scale(1); }
+  @media (prefers-reduced-motion: reduce) { .js .photo img { transform: none; transition: opacity 1s ease-out; } }
+
+  /* Background photos: no frames. Soft edges melt into the scene, they
+     drift at their own pace and fade up when they arrive. */
+  .bg-photo {
+    position: absolute; z-index: -1; margin: 0; pointer-events: none;
+    will-change: transform;
+  }
+  .bg-photo img {
+    width: 100%; height: 100%; object-fit: cover;
+    -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 35%, transparent 100%);
+    mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 35%, transparent 100%);
+    opacity: var(--o, 0.5);
+  }
+  .dark .bg-photo img { filter: saturate(0.75) contrast(1.05); }
+  .lit .bg-photo img, .sponsor .bg-photo img { mix-blend-mode: multiply; filter: grayscale(0.35) sepia(0.2); }
+  .js .bg-photo img { opacity: 0; transition: opacity 1.8s ease-out; }
+  .js .bg-photo.in img { opacity: var(--o, 0.5); }
+
+  /* ---------- Next meetup ---------- */
+  .next { align-items: center; row-gap: 32px; }
+  .next .copy { grid-column: 1 / 4; }
+  .next h2 { margin-bottom: 28px; }
+  .next .callout { display: block; text-decoration: none; }
+  .next .callout .when {
+    display: block; color: var(--marigold);
+    font-variation-settings: "wdth" 125; font-weight: 850; text-transform: uppercase;
+    font-size: clamp(3.4rem, 9vw, 8rem); line-height: 0.9; letter-spacing: -0.01em;
+  }
+  .next .callout .sub {
+    display: inline-block; margin-top: 22px;
+    padding: 12px 22px; border-radius: 999px; border: 1.5px solid var(--marigold);
+    font-weight: 700; transition: background-color .2s, color .2s;
+  }
+  .next .callout:hover .sub { background: var(--marigold); color: var(--deep); text-shadow: none; }
+  .next .note { margin: 22px 0 0; color: var(--warm-soft); max-width: 40ch; }
+  .next { min-height: 90vh; }
+  .next .copy { position: relative; }
+  .next .bg-photo { right: -6%; top: 0; width: 66%; height: 100%; --o: 0.62; }
+  .next .bg-photo img { object-position: 60% 20%; }
+  #about .bg-photo img { object-position: 75% 50%; }
+
+  /* ---------- Recent meetups ---------- */
+  .recent h2 { grid-column: 1 / -1; }
+  .reels { grid-column: 1 / -1; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .reel { display: flex; flex-direction: column; }
+  .reel .video { position: relative; aspect-ratio: 16 / 9; border-radius: 6px; background: rgba(19, 25, 54, 0.4); }
+  .reel .video img { filter: saturate(0.85); }
+  .reel .video::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(19, 25, 54, 0.1), rgba(19, 25, 54, 0.65)); }
+  .reel .play {
+    position: absolute; z-index: 1; left: 18px; bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 0.85rem; font-weight: 600; color: var(--warm);
+  }
+  .reel .play b { width: 44px; height: 44px; border-radius: 50%; background: var(--marigold); display: grid; place-items: center; }
+  .reel .play b::before { content: ""; margin-left: 4px; border-style: solid; border-width: 8px 0 8px 13px; border-color: transparent transparent transparent var(--deep); }
+  .reel .meta { padding: 16px 2px 0; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .reel time { color: var(--marigold); font-weight: 700; font-size: 0.9rem; }
+  .reel h3 { margin: 0; font-size: 1.25rem; line-height: 1.2; text-transform: none; letter-spacing: 0; font-weight: 750; font-variation-settings: "wdth" 112; }
+  .reel p { margin: 0; color: var(--warm-soft); font-size: 0.95rem; line-height: 1.45; }
+  .reel a { margin-top: auto; padding-top: 10px; font-weight: 600; font-size: 0.95rem; text-underline-offset: 3px; }
+
+  /* ---------- Join (first room indoors) ---------- */
+  .join { row-gap: 40px; }
+  .join h2 { grid-column: 1 / -1; }
+  .join .body { grid-column: 1 / 4; }
+  .join { min-height: 110vh; }
+  .indoors { isolation: isolate; }
+  .section.lit { isolation: auto; }
+  .join .bg-photo.a { right: -8%; top: 4%; width: 58%; height: 58%; --o: 0.92; }
+  .join .bg-photo.b { right: 20%; top: 46%; width: 38%; height: 46%; --o: 0.85; }
+  .join .bg-photo.c { right: -4%; top: 58%; width: 34%; height: 40%; --o: 0.75; }
+
+  .contact-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  .btn {
+    display: inline-block; padding: 10px 20px; border-radius: 999px;
+    border: 1.5px solid currentColor; font-weight: 600;
+    transition: background-color .2s, color .2s;
+  }
+  .section.lit .btn { text-decoration: none; }
+  .section.lit .btn:hover { background: var(--ink); color: var(--wall); }
+
+  /* ---------- Sponsor: a warm oak room ---------- */
+  .sponsor { background: var(--oak); color: var(--ink); row-gap: 32px; }
+  .sponsor h2 { grid-column: 1 / -1; }
+  .sponsor .body { grid-column: 1 / 4; }
+  .sponsor { isolation: isolate; overflow: hidden; }
+  .sponsor .bg-photo { right: -6%; top: 6%; width: 62%; height: 92%; --o: 0.8; }
+  .sponsor a { color: var(--ink); text-underline-offset: 3px; }
+  /* The logo's white ground drops out on oak, so it reads as printed on the wall */
+  .sponsor-plate { display: inline-block; margin: 0 0 20px -18px; padding: 8px 18px; border-radius: 4px; }
+  .sponsor-plate img { width: 240px; height: auto; mix-blend-mode: multiply; filter: contrast(1.4); }
+  details { margin-top: 20px; border-top: 1px solid rgba(35, 42, 77, 0.3); border-bottom: 1px solid rgba(35, 42, 77, 0.3); }
+  summary { cursor: pointer; padding: 14px 0; font-weight: 700; list-style: none; display: flex; align-items: center; gap: 10px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "+"; display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; font-size: 1rem; line-height: 1; }
+  details[open] summary::before { content: "−"; }
+  .tour { list-style: none; padding: 0; margin: 12px 0 20px; display: grid; gap: 6px; }
+
+  footer {
+    position: relative; z-index: 2; background: var(--ink); color: var(--warm);
+    padding: 72px var(--gutter) 36px;
+    display: grid; grid-template-columns: repeat(6, 1fr); column-gap: 24px; row-gap: 20px;
+  }
+  footer .f-name { grid-column: 1 / 4; margin: 0; font-size: clamp(1.5rem, 3vw, 2.2rem); }
+  footer .f-tag { grid-column: 1 / 4; margin: 0; color: var(--warm-soft); }
+  footer nav { grid-column: 4 / -1; grid-row: 1 / 3; display: flex; gap: 10px; justify-content: flex-end; align-items: flex-start; flex-wrap: wrap; }
+  footer .copy {
+    grid-column: 1 / -1; margin: 24px 0 0; font-size: 0.85rem; color: rgba(255, 246, 232, 0.7);
+    border-top: 1px solid var(--rule); padding-top: 18px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 960px) {
+    .reels { grid-template-columns: 1fr 1fr; }
+    .reels li:last-child { display: none; }
+  }
+  @media (max-width: 860px) and (min-width: 601px) { .reels li:last-child { display: none; } }
+  @media (max-width: 860px) {
+    .section h2, .section .body, .next .copy, .join .body, .sponsor .body { grid-column: 1 / -1; }
+    /* On narrow screens the photos become a soft band in the flow */
+    .bg-photo { position: relative; inset: auto !important; grid-column: 1 / -1; grid-row: auto; width: calc(100% + 2 * var(--gutter)) !important; height: 62vw !important; margin: 0 calc(-1 * var(--gutter)); z-index: 0; transform: none !important; }
+    .join .bg-photo.b, .join .bg-photo.c, #about .bg-photo { display: none; }
+    .next, .join { min-height: 0; }
+    .tagline { grid-column: 2 / -1; }
+    footer .f-name, footer .f-tag, footer nav { grid-column: 1 / -1; grid-row: auto; justify-content: flex-start; }
+    .alt { top: auto; bottom: 16px; right: 16px; }
+    .alt .track { flex: none; width: auto; height: auto; background: none; }
+    .alt .bob { position: static; transform: none !important; display: flex; align-items: center; gap: 8px; flex-direction: row-reverse; background: rgba(19, 25, 54, 0.85); border: 1px solid rgba(242, 169, 59, 0.5); padding: 5px 12px 5px 10px; border-radius: 999px; }
+    .alt .bob i { width: 8px; height: 8px; box-shadow: none; }
+    .alt .read { position: static; transform: none; background: none; border: 0; padding: 0; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 1.0625rem; }
+    .survey { grid-template-columns: repeat(3, 1fr); }
+    .survey span:nth-child(n+4) { display: none; }
+    .survey span:nth-child(3) { border-right: 1px solid var(--grid); }
+    .survey span:nth-child(3)::after { content: none; }
+    .indoors .grid-in { grid-template-columns: repeat(3, 1fr); }
+    .indoors .grid-in span:nth-child(n+4) { display: none; }
+    .indoors .grid-in span:nth-child(3) { border-right: 1px solid var(--grid-ink); }
+    #activities { padding-bottom: 36vh; }
+    .pill { padding: 5px 11px; font-size: 0.8rem; }
+    h1 { font-size: clamp(2.2rem, 11.5vw, 3.4rem); }
+    h1 .l1 { padding-left: 0; }
+    .tagline { grid-column: 1 / -1; }
+    .hero-body { padding-bottom: 8vh; align-content: start; padding-top: 6vh; }
+    .marker { position: relative; right: auto; bottom: auto; margin: 0 var(--gutter) 22vh; align-self: flex-start; }
+    .marker .pin::before { display: none; }
+    .marker .pin { margin-left: 8px; }
+    .section { padding: 11vh var(--gutter); }
+    .section h2 { font-size: clamp(2.1rem, 11vw, 3.4rem); }
+    .activities { grid-template-columns: 1fr; }
+    .reels { grid-template-columns: 1fr; }
+    .reels li:last-child { display: flex; }
+    .fog.f2 { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" aria-hidden="true">
+  <div class="sky sky-dusk"></div>
+  <div class="sky sky-blue" id="sky-blue"></div>
+  <div class="sky sky-night" id="sky-night"></div>
+  <div class="stars" id="stars"></div>
+  <div class="sun" id="sun"></div>
+
+  <div class="ridge r1" data-rise="20" data-grow="0.04" data-peak="0.3" data-night="#4B5790">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 210 C 90 170, 160 150, 250 175 S 420 120, 520 140 S 700 90, 820 125 S 1000 150, 1090 110 S 1280 80, 1360 120 L 1440 130 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+  </div>
+  <div class="ridge r2" data-rise="24" data-grow="0.06" data-peak="0.5" data-night="#39457A">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 190 C 120 150, 200 175, 300 150 S 470 110, 590 160 S 760 190, 880 140 S 1060 90, 1170 150 S 1340 170, 1440 140 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="fog f1" data-drift="-18"></div>
+  </div>
+  <div class="ridge r3" data-rise="28" data-grow="0.08" data-peak="0.7" data-night="#2B3565">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 170 C 140 130, 230 190, 360 160 S 560 90, 680 140 S 880 200, 1000 150 S 1200 110, 1310 160 L 1440 150 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="fog f2" data-drift="24"></div>
+  </div>
+  <div class="ridge r4" data-rise="32" data-grow="0.1" data-peak="0.9" data-night="#1F2851">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 150 C 110 110, 250 170, 380 140 S 600 190, 740 130 S 930 80, 1060 140 S 1300 180, 1440 120 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="fog f3" data-drift="-30"></div>
+  </div>
+  <div class="ridge r5" data-rise="36" data-grow="0.08" data-peak="0.4" data-night="#141A38">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path d="M0 120 C 160 80, 300 150, 470 120 S 760 70, 900 130 S 1150 170, 1290 110 L 1440 90 L 1440 400 L 0 400 Z"/></svg><div class="fill"></div>
+    <div class="lights" id="lights"><span class="home"><b></b>Studio IX</span></div>
+  </div>
+
+  <div class="fireflies" id="fireflies"></div>
+
+  <svg class="grain">
+    <filter id="grain-f"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#grain-f)"/>
+  </svg>
+</div>
+
+<div class="survey" id="survey" aria-hidden="true">
+  <span data-tick="78.52° W"></span>
+  <span data-tick="78.50° W"></span>
+  <span data-tick="78.48° W"></span>
+  <span data-tick="78.46° W"></span>
+  <span data-tick="78.44° W"></span>
+  <span data-tick="78.42° W"></span>
+</div>
+
+<div class="alt" id="alt" aria-hidden="true">
+  <span class="end"><b>Humpback Rocks</b>3,080 ft</span>
+  <div class="track">
+    <span class="bob" id="bob"><i></i><span class="read"><span id="elev">3,080</span><small>ft</small></span></span>
+  </div>
+  <span class="end"><b>Charlottesville</b>594 ft</span>
+</div>
+
+<div class="page">
+  <header class="hero" id="top">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="#top">
+        <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 19 L10 12 L13 15 L18 8 L24 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="18" cy="8" r="1.8" fill="#F2A93B"/></svg>
+        Cville AI Explorers
+      </a>
+      <ul>
+        <li><a class="pill" href="#about">About</a></li>
+        <li><a class="pill" href="#mission">Mission</a></li>
+        <li><a class="pill" href="#join">Join us</a></li>
+        <li><a class="pill" href="#contact">Contact</a></li>
+        <li><a class="pill solid" href="https://www.meetup.com/cville-tech/">Meetup</a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-body">
+      <p class="coords" id="coords"><span>38.0293° N</span><span>78.4767° W</span></p>
+      <h1 class="display"><span class="l1">Cville AI</span><span class="l2">Explorers</span></h1>
+      <p class="tagline" id="tagline">Building with AI in Charlottesville, Virginia</p>
+    </div>
+
+    <a class="marker" data-meetup href="https://www.meetup.com/cville-tech/events/315584929/">
+      <span class="pin" aria-hidden="true"></span>
+      <span class="card">
+        <span class="label">Next Meetup</span>
+        <span class="when">July 28, 2026</span>
+        <span class="sub">See the event on Meetup</span>
+      </span>
+    </a>
+  </header>
+
+  <main>
+    <section class="section dark next" id="next" aria-labelledby="next-title">
+      <div class="copy">
+        <h2 class="display" id="next-title">Next Meetup</h2>
+        <a class="callout" data-meetup href="https://www.meetup.com/cville-tech/events/315584929/">
+          <span class="when">July 28, 2026</span>
+          <span class="sub">See the event on Meetup</span>
+        </a>
+        <p class="note">We meet monthly, usually at Studio IX, 969 2nd St SE in downtown Charlottesville.</p>
+      </div>
+      <figure class="bg-photo" data-speed="0.12"><img src="img/studio-collab.jpg" alt="" loading="lazy"></figure>
+    </section>
+
+    <section class="section dark recent" id="recent">
+      <h2 class="display">Recent Meetups</h2>
+      <ul class="reels">
+        <li class="reel">
+          <figure class="photo video"><img src="img/demo-night.jpg" alt="" loading="lazy"><span class="play"><b></b>Recording coming soon</span></figure>
+          <div class="meta">
+            <time datetime="2026-08-27">August 27, 2026</time>
+            <h3>Breaking Into Data Science &amp; AI Engineering</h3>
+            <p>Panel with Kerry Guerrero, Hunter Moore, Cory Everington and Patrick Harrison, with Charlottesville Data Science at the UVA School of Data Science.</p>
+            <a href="https://www.meetup.com/cville-tech/events/316018645/">Event page</a>
+          </div>
+        </li>
+        <li class="reel">
+          <figure class="photo video"><img src="img/hands-deck.jpg" alt="" loading="lazy"><span class="play"><b></b>Recording coming soon</span></figure>
+          <div class="meta">
+            <time datetime="2026-07-28">July 28, 2026</time>
+            <h3>Building a Second Brain / Domain-Specific Agents</h3>
+            <p>Kyle Carmitchel and Justin Schroeder.</p>
+            <a href="https://www.meetup.com/cville-tech/events/315584929/">Event page</a>
+          </div>
+        </li>
+        <li class="reel">
+          <figure class="photo video"><img src="img/hands-faders.jpg" alt="" loading="lazy"><span class="play"><b></b>Recording coming soon</span></figure>
+          <div class="meta">
+            <time datetime="2026-06-30">June 30, 2026</time>
+            <h3>OpenClaw and Other Continuous AI Agents</h3>
+            <p>John Athayde, Owen Zanzal and Stephen Levin.</p>
+            <a href="https://www.meetup.com/cville-tech/events/315069497/">Event page</a>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="section dark" id="about">
+      <figure class="bg-photo" data-speed="0.18"><img src="img/headset.jpg" alt="" loading="lazy"></figure>
+      <h2 class="display">About Us</h2>
+      <div class="body">
+        <p class="lead intro">We are a group of builders, learners, and enthusiasts who gather to:</p>
+        <ul class="waypoints">
+          <li>Build practical AI applications and tools</li>
+          <li>Share technical knowledge and implementation experiences</li>
+          <li>Learn about and explore emerging AI technologies</li>
+          <li>Discover ways to enhance productivity and creativity</li>
+          <li>Support each other in creating AI-powered solutions</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section dark" id="mission">
+      <h2 class="display">Our Mission</h2>
+      <div class="body">
+        <p class="lead">Our mission is to foster a community where people can develop AI building skills through hands-on projects, technical sharing, and collaborative learning, and discover practical ways to integrate AI tools into their work and daily lives. While our focus is on active building and implementation, we welcome anyone interested in learning these skills.</p>
+      </div>
+    </section>
+
+    <section class="section dark" id="activities">
+      <h2 class="display">Activities and Directions</h2>
+      <div class="body">
+        <ul class="activities">
+          <li>Exploring modern AI platforms and workflow tools</li>
+          <li>Technical demos and talks from AI builders</li>
+          <li>Technical book discussions and learning circles</li>
+          <li>Collaborative building sessions and group projects</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="indoors" id="indoors">
+    <div class="grid-in" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <section class="section lit join" id="join">
+      <h2 class="display">Join Us</h2>
+      <div class="body">
+        <p class="lead">Whether you're actively building AI applications or eager to learn how, there's a place for you in our community. We emphasize practical skills and implementation while maintaining an inclusive environment for learning.</p>
+        <h3>Get Involved</h3>
+        <ul class="waypoints">
+          <li>Attend our meetups</li>
+          <li>Share your AI experiences</li>
+          <li>Collaborate with other members</li>
+          <li>Present your projects or findings</li>
+          <li>Learn from peers</li>
+        </ul>
+      </div>
+      <figure class="bg-photo a" data-speed="0.08"><img src="img/pottery.jpg" alt="" loading="lazy"></figure>
+      <figure class="bg-photo b" data-speed="0.16"><img src="img/brush.jpg" alt="" loading="lazy"></figure>
+      <figure class="bg-photo c" data-speed="0.24"><img src="img/pen.jpg" alt="" loading="lazy"></figure>
+    </section>
+
+    <section class="section lit" id="contact">
+      <h2 class="display">Contact</h2>
+      <div class="body">
+        <p>Cville AI Explorers operates under the <a href="https://www.meetup.com/cville-tech/">Charlottesville Technologists meetup</a>. Contact organizers in the <a href="https://cville.slack.com/archives/C08DTL1TS1K">#cvilleaiexplorers</a> channel on <a href="https://cville.slack.com">Cville Slack</a>.</p>
+        <div class="contact-links">
+          <a class="btn" href="https://www.meetup.com/cville-tech/">Charlottesville Technologists on Meetup</a>
+          <a class="btn" href="https://cville.slack.com/archives/C08DTL1TS1K">#cvilleaiexplorers on Slack</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section sponsor" id="sponsors">
+      <h2 class="display">Our Sponsors</h2>
+      <div class="body">
+        <a class="sponsor-plate" href="https://www.studioix.co/"><img src="STUDIO_IX_Logo_White.jpg" alt="Studio IX"></a>
+        <p class="lead">Studio IX is a coworking space in downtown Charlottesville, Virginia, designed for freelancers, entrepreneurs, and remote workers.</p>
+        <details>
+          <summary>Learn More</summary>
+          <p>Studio IX offers a flexible shared office environment with options for open workspaces, dedicated desks, and private offices. The space fosters a collaborative community through weekly events and mixers, featuring a 'warm industrial' atmosphere with ample natural light.</p>
+          <p>Amenities include high-speed internet, soundproof phone booths, conference rooms, and premium coffee. Studio IX is staffed by a community manager on weekdays and provides 24/7 access for members.</p>
+          <p>Tours of the space are available; interested individuals can contact them via:</p>
+          <ul class="tour">
+            <li>Email: <a href="mailto:COWORK@STUDIOIX.CO">COWORK@STUDIOIX.CO</a></li>
+            <li>Phone: <a href="tel:+14342603803">434.260.3803</a></li>
+            <li>Website: <a href="https://www.studioix.co/">https://www.studioix.co/</a></li>
+          </ul>
+        </details>
+      </div>
+      <figure class="bg-photo" data-speed="0.1"><img src="img/wood-studio.jpg" alt="" loading="lazy"></figure>
+    </section>
+
+    <section class="section lit" id="conduct">
+      <h2 class="display">Code of Conduct</h2>
+      <div class="body">
+        <p>Cville AI Explorers follows the <a href="https://github.com/cville/conduct">Cville Slack Code of Conduct</a>.</p>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <footer>
+    <p class="f-name display">Cville AI Explorers</p>
+    <p class="f-tag">Building with AI in Charlottesville, Virginia</p>
+    <nav aria-label="Footer">
+      <a class="pill" href="https://www.meetup.com/cville-tech/">Meetup</a>
+      <a class="pill" href="https://github.com/cvilleaiexplorers">GitHub</a>
+    </nav>
+    <p class="copy"><span>© 2026 Cville AI Explorers. All rights reserved.</span><span>38.0293° N, 78.4767° W, elevation 594 ft</span></p>
+  </footer>
+</div>
+
+<script>
+  document.documentElement.classList.add('js');
+
+  // Next meetup: dated link until the day passes, then TBA pointing at the group page.
+  // ?date=YYYY-MM-DD overrides the meetup date for previewing.
+  (function () {
+    var MEETUP = { date: '2026-07-28', event: 'https://www.meetup.com/cville-tech/events/315584929/', group: 'https://www.meetup.com/cville-tech/' };
+    var override = new URLSearchParams(location.search).get('date');
+    var iso = /^\d{4}-\d{2}-\d{2}$/.test(override || '') ? override : MEETUP.date;
+    var p = iso.split('-').map(Number);
+    var tba = Date.now() > new Date(p[0], p[1] - 1, p[2], 23, 59, 59).getTime();
+    var label = new Date(p[0], p[1] - 1, p[2]).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    document.querySelectorAll('[data-meetup]').forEach(function (el) {
+      el.dataset.state = tba ? 'tba' : 'dated';
+      el.href = tba ? MEETUP.group : MEETUP.event;
+      el.querySelector('.when').textContent = tba ? 'TBA' : label;
+      el.querySelector('.sub').textContent = tba ? 'Check Meetup Page' : 'See the event on Meetup';
+    });
+  })();
+
+  // Photos fade in as they arrive.
+  (function () {
+    var photos = document.querySelectorAll('.photo, .bg-photo');
+    if (!('IntersectionObserver' in window)) { photos.forEach(function (f) { f.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    photos.forEach(function (f) { io.observe(f); });
+  })();
+
+  // The journey. Scroll position drives the whole scene.
+  (function () {
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var TOP = 3080, BOTTOM = 594; // Humpback Rocks to Charlottesville, in feet
+
+    // Seeded scatter so stars, lights and fireflies land in the same place every visit.
+    var seed = 7;
+    function rand() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+    function scatter(parent, n, fn) {
+      for (var i = 0; i < n; i++) { var el = document.createElement('i'); fn(el); parent.appendChild(el); }
+    }
+
+    var stars = document.getElementById('stars');
+    scatter(stars, 70, function (s) {
+      if (rand() > 0.88) s.className = 'b';
+      s.style.left = (rand() * 100).toFixed(2) + '%';
+      s.style.top = (rand() * 100).toFixed(2) + '%';
+      s.style.opacity = (0.35 + rand() * 0.65).toFixed(2);
+    });
+    var lights = document.getElementById('lights');
+    scatter(lights, 60, function (l) {
+      // Denser toward the middle of the valley, like a town seen from the hills.
+      l.style.left = (50 + (rand() + rand() + rand() - 1.5) * 52).toFixed(2) + '%';
+      l.style.top = (8 + rand() * 80).toFixed(2) + '%';
+      l.style.opacity = (0.5 + rand() * 0.5).toFixed(2);
+    });
+    var flies = document.getElementById('fireflies');
+    scatter(flies, 26, function (f) {
+      f.style.left = (4 + rand() * 92).toFixed(2) + '%';
+      f.style.top = (10 + rand() * 85).toFixed(2) + '%';
+      f.style.setProperty('--t', (3 + rand() * 4).toFixed(2) + 's');
+      f.style.setProperty('--d', (-rand() * 6).toFixed(2) + 's');
+      f.style.setProperty('--w', (7 + rand() * 8).toFixed(2) + 's');
+      f.style.setProperty('--x', ((rand() - 0.5) * 80).toFixed(0) + 'px');
+      f.style.setProperty('--y', (-10 - rand() * 50).toFixed(0) + 'px');
+    });
+
+    // Split section headings into words that slide in from either side and settle.
+    var heads = Array.prototype.map.call(document.querySelectorAll('.section h2'), function (h) {
+      var text = h.textContent.trim();
+      h.setAttribute('aria-label', text);
+      h.textContent = '';
+      var spans = text.split(/\s+/).map(function (w, k) {
+        var span = document.createElement('span');
+        span.className = 'w';
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = w;
+        if (k) h.appendChild(document.createTextNode(' '));
+        h.appendChild(span);
+        return span;
+      });
+      return { el: h, words: spans, shown: 1 };
+    });
+
+    function hex(h) { h = h.trim().replace('#', ''); return [0, 2, 4].map(function (k) { return parseInt(h.substr(k, 2), 16); }); }
+    function mix(a, b, t) { return 'rgb(' + a.map(function (v, k) { return Math.round(v + (b[k] - v) * t); }).join(',') + ')'; }
+    function ramp(p, a, b) { return Math.min(1, Math.max(0, (p - a) / (b - a))); }
+    function ease(t) { return 1 - Math.pow(1 - t, 2); }
+    function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+    var ridges = Array.prototype.map.call(document.querySelectorAll('.ridge'), function (r) {
+      return { el: r, svg: r.querySelector('svg'), rise: +r.dataset.rise, grow: +r.dataset.grow, peak: +r.dataset.peak, from: hex(getComputedStyle(r).getPropertyValue('--c')), to: hex(r.dataset.night) };
+    });
+    var fogs = Array.prototype.map.call(document.querySelectorAll('.fog'), function (f) { return { el: f, drift: +f.dataset.drift }; });
+    function $(id) { return document.getElementById(id); }
+    var sun = $('sun'), skyBlue = $('sky-blue'), skyNight = $('sky-night');
+    var bob = $('bob'), elev = $('elev'), alt = $('alt'), survey = $('survey');
+    var coords = $('coords'), tagline = $('tagline'), indoors = $('indoors');
+    var l1 = document.querySelector('h1 .l1'), l2 = document.querySelector('h1 .l2');
+    var narrow = window.matchMedia('(max-width: 860px)');
+    var drifters = Array.prototype.map.call(document.querySelectorAll('.bg-photo[data-speed]'), function (el) { return { el: el, speed: +el.dataset.speed }; });
+
+    // Where the descent ends and the indoors begins, in scroll pixels.
+    var joinTop = 1, arrive = 1;
+    function measure() {
+      joinTop = indoors.getBoundingClientRect().top + window.scrollY;
+      arrive = Math.max(1, joinTop - window.innerHeight * 1.05);
+    }
+
+    // The scene trails the scroll slightly, like a camera on a slow dolly.
+    var shown = null, ticking = false;
+    function request() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight;
+      var y = window.scrollY;
+      var more = false;
+
+      var target = Math.min(1, Math.max(0, y / arrive));
+      if (shown === null || still) shown = target;
+      else shown += (target - shown) * 0.09;
+      if (Math.abs(target - shown) < 0.0004) shown = target; else more = true;
+      var p = shown, e = ease(p);
+
+      // Time of day
+      skyBlue.style.opacity = ramp(p, 0.05, 0.3);
+      skyNight.style.opacity = ramp(p, 0.3, 0.62);
+      stars.style.opacity = ramp(p, 0.4, 0.75);
+      lights.style.opacity = ramp(p, 0.7, 0.92);
+      flies.style.opacity = ramp(p, 0.82, 0.98);
+
+      // Sunset
+      sun.style.opacity = (1 - ramp(p, 0.18, 0.36)).toFixed(3);
+      if (!still) sun.style.transform = 'translate3d(0,' + (ease(ramp(p, 0, 0.36)) * 34).toFixed(2) + 'svh,0)';
+
+      // Ridges darken with nightfall and, unless motion is reduced, rise and loom as we descend
+      var dark = ramp(p, 0.04, 0.55);
+      ridges.forEach(function (r) {
+        r.el.style.setProperty('--c', mix(r.from, r.to, dark));
+        if (!still) {
+          r.el.style.transform = 'translate3d(0,' + (-r.rise * e).toFixed(2) + 'svh,0) scale(' + (1 + r.grow * e).toFixed(4) + ')';
+          r.svg.style.transform = 'scaleY(' + (1 + r.peak * e).toFixed(4) + ')';
+        }
+      });
+
+      // Haze gathers in the hollows mid-descent, then clears for the night sky
+      var haze = ramp(p, 0.04, 0.2) * (1 - ramp(p, 0.5, 0.75));
+      fogs.forEach(function (f) {
+        f.el.style.opacity = haze.toFixed(3);
+        if (!still) f.el.style.transform = 'translate3d(' + (f.drift * p).toFixed(2) + 'vw,0,0)';
+      });
+
+      // How far the white wall has risen into view
+      var inside = ramp(y, joinTop - vh * 0.9, joinTop - vh * 0.4);
+
+      // Altimeter lands at 594 ft and bows out as we go indoors
+      var ft = p > 0.998 ? BOTTOM : Math.round((TOP - (TOP - BOTTOM) * p) / 10) * 10;
+      elev.textContent = ft.toLocaleString('en-US');
+      alt.style.opacity = Math.max(0, 1 - inside * 1.6).toFixed(3);
+      if (!narrow.matches) bob.style.top = (p * 100).toFixed(2) + '%';
+
+      // Hero headline parts drift apart as we leave the crest
+      var ph = Math.min(1, y / (vh * 0.9));
+      if (!still) {
+        l1.style.transform = 'translate3d(' + (-ph * 22).toFixed(2) + 'vw,0,0)';
+        l2.style.transform = 'translate3d(' + (ph * 22).toFixed(2) + 'vw,0,0)';
+      }
+      l1.style.opacity = l2.style.opacity = (1 - ph * 0.9).toFixed(3);
+      coords.style.opacity = tagline.style.opacity = (1 - ph * 1.4).toFixed(3);
+      survey.style.setProperty('--ticks', (1 - ph).toFixed(3));
+
+      // Section headings slide in from the edges and settle into place
+      // once they reach the upper half of the view. Eased both ways.
+      if (!still) heads.forEach(function (h) {
+        var r = h.el.getBoundingClientRect();
+        if (r.top > vh * 1.3 || r.bottom < -vh * 0.3) return;
+        var t = Math.min(1, Math.max(0, (r.top - vh * 0.5) / (vh * 0.45)));
+        h.shown += (t - h.shown) * 0.14;
+        if (Math.abs(t - h.shown) < 0.001) h.shown = t; else more = true;
+        var k = easeInOut(h.shown);
+        var n = h.words.length;
+        h.words.forEach(function (w, i) {
+          var dir = n === 1 ? 1 : (i < n / 2 ? -1 : 1);
+          w.style.transform = 'translate3d(' + (dir * k * 18).toFixed(2) + 'vw,0,0)';
+          w.style.opacity = (1 - k * 0.75).toFixed(3);
+        });
+      });
+
+      // Background photos drift at their own pace
+      if (!still && !narrow.matches) drifters.forEach(function (d) {
+        var r = d.el.parentNode.getBoundingClientRect();
+        if (r.bottom < -vh || r.top > vh * 2) return;
+        var off = (r.top + r.height / 2 - vh / 2) * d.speed;
+        d.el.style.transform = 'translate3d(0,' + off.toFixed(1) + 'px,0)';
+      });
+
+      if (more) request();
+    }
+
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', function () { measure(); request(); });
+    window.addEventListener('load', function () { measure(); request(); });
+    if ('ResizeObserver' in window) new ResizeObserver(function () { measure(); request(); }).observe(document.body);
+    narrow.addEventListener('change', function () { bob.style.top = ''; request(); });
+    measure();
+    update();
+  })();
+</script>
+</body>
+</html>

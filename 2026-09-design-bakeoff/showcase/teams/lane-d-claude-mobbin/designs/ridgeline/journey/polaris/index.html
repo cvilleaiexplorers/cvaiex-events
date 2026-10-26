@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cville AI Explorers</title>
+<meta name="description" content="Building with AI in Charlottesville, Virginia">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Figtree:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #17224A;
+    --dusk: #2C3A6B;
+    --brass: #D4A24C;
+    --lamp: #F7E3B5;
+    --star: #FFF8EA;
+    --lamp-dim: #CDBF9E;
+    --rule: rgba(212, 162, 76, .38);
+    --display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+    --body: "Figtree", system-ui, sans-serif;
+    --measure: 64ch;
+    --gutter: clamp(16px, 5vw, 64px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--lamp);
+    font-family: var(--body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: var(--star); text-decoration-color: var(--brass); text-underline-offset: .2em; text-decoration-thickness: 1px; }
+  a:hover { color: var(--brass); }
+  :focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; border-radius: 2px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--lamp); color: var(--ink); padding: .5em 1em; z-index: 10; }
+  .skip:focus { left: 8px; }
+
+  /* ---------- top bar ---------- */
+  .bar {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+    padding: 20px var(--gutter);
+    font-size: .95rem;
+  }
+  .bar .mark { font-family: var(--display); font-size: 1.25rem; color: var(--star); text-decoration: none; }
+  .bar nav ul { display: flex; gap: 1.5rem; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+  .bar nav a { color: var(--lamp); text-decoration: none; }
+  .bar nav a:hover { color: var(--brass); }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: end;
+    gap: 2rem;
+    padding: 2rem var(--gutter) 0;
+    background: linear-gradient(to bottom, var(--ink) 0%, var(--ink) 45%, var(--dusk) 100%);
+  }
+  .hero-text { padding-bottom: clamp(3rem, 8vw, 7rem); align-self: center; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(3rem, 8.4vw, 7.25rem);
+    line-height: .92;
+    letter-spacing: -.01em;
+    color: var(--star);
+    margin: 0 0 1.25rem;
+  }
+  h1 .line2 { display: block; font-style: italic; color: var(--lamp); }
+  .tagline { font-size: clamp(1.1rem, 1.6vw, 1.3rem); margin: 0 0 1.75rem; color: var(--lamp); }
+  .reading {
+    max-width: 38ch; margin: 0 0 2.25rem;
+    font-size: .98rem; color: var(--lamp-dim);
+    border-left: 1px solid var(--brass); padding-left: 1rem;
+  }
+  .fix { display: inline-grid; gap: .15rem; }
+  .fix-label { font-size: .95rem; color: var(--brass); }
+  .fix-date {
+    font-family: var(--display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.05;
+    color: var(--star);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: .6rem;
+  }
+  .fix-date::before {
+    content: ""; width: .5em; height: .5em; flex: none;
+    background: var(--star);
+    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  }
+  .fix-date:hover { color: var(--brass); }
+  .fix-date:hover::before { background: var(--brass); }
+  .fix-note { font-size: .92rem; color: var(--lamp-dim); }
+  .fix[data-state="tba"] .fix-date { font-style: italic; font-size: clamp(1.6rem, 2.9vw, 2.3rem); }
+  .fix-note { margin-top: .35rem; }
+
+  .sky { width: 100%; height: auto; display: block; overflow: hidden; }
+  .sky text { font-family: var(--body); fill: var(--lamp-dim); }
+  .sky .deg { font-size: 13px; }
+  .sky .big { font-family: var(--display); font-size: 30px; fill: var(--star); font-style: italic; }
+  .sky .star-label { font-family: var(--display); font-size: 20px; fill: var(--star); }
+  .arm { transform: rotate(-38deg); }
+  .measured { stroke-dasharray: 412; stroke-dashoffset: 0; }
+  .reveal { opacity: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .arm { animation: sweep 2.6s cubic-bezier(.3, .05, .2, 1) .4s both; }
+    .measured { animation: draw 2.6s cubic-bezier(.3, .05, .2, 1) .4s both; }
+    .reveal { animation: appear .9s ease-out 2.9s both; }
+    .polaris-glint { animation: glint 1.2s ease-out 2.9s both; transform-box: fill-box; transform-origin: center; }
+  }
+  @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(-38deg); } }
+  @keyframes draw { from { stroke-dashoffset: 412; } to { stroke-dashoffset: 0; } }
+  @keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes glint { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.5); opacity: 1; } 100% { transform: scale(1); } }
+
+  .ridge { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: clamp(36px, 5vw, 64px); display: block; pointer-events: none; }
+  .sky { position: relative; z-index: 1; margin-bottom: clamp(-8px, -.4vw, 0px); }
+
+  /* ---------- sections ---------- */
+  main > section { padding: clamp(4rem, 9vw, 7.5rem) var(--gutter); }
+  .chapter {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 1.5rem 3rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  h2 {
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05;
+    color: var(--star); margin: 0;
+  }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.6rem; color: var(--star); margin: 0 0 .75rem; }
+  .prose { max-width: var(--measure); }
+  .prose p { margin: 0 0 1.1rem; }
+  .prose p:last-child { margin-bottom: 0; }
+
+  .bearing { list-style: none; margin: 1.25rem 0 0; padding: 0; }
+  .bearing li {
+    display: grid; grid-template-columns: 1.5rem 1fr; gap: .75rem;
+    padding: .8rem 0; border-top: 1px solid var(--rule);
+  }
+  .bearing li:last-child { border-bottom: 1px solid var(--rule); }
+  .bearing li::before {
+    content: ""; width: .6rem; height: .6rem; margin-top: .55rem;
+    background: var(--brass);
+    clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  }
+
+  .mission { background: var(--dusk); }
+  .mission blockquote {
+    margin: 0; font-family: var(--display); font-style: italic;
+    font-size: clamp(1.4rem, 2.6vw, 2.05rem); line-height: 1.35; color: var(--star);
+    max-width: 34em;
+  }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; max-width: var(--measure); }
+
+  /* ---------- constellation ---------- */
+  .log-head { max-width: 1200px; margin: 0 auto 2.5rem; display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; flex-wrap: wrap; }
+  .log-head p { margin: .6rem 0 0; max-width: 52ch; color: var(--lamp-dim); }
+  .toggle {
+    font: inherit; font-size: .95rem; color: var(--lamp); background: none;
+    border: 1px solid var(--brass); border-radius: 999px; padding: .45rem 1.1rem; cursor: pointer;
+  }
+  .toggle:hover { background: var(--brass); color: var(--ink); }
+  .chart-wrap {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: minmax(0, 1fr) 20rem; gap: 2rem; align-items: start;
+  }
+  .chart { width: 100%; height: auto; display: block; }
+  .chart .grid line { stroke: var(--rule); stroke-width: 1; }
+  .chart .grid text { font-family: var(--body); font-size: 12px; fill: var(--lamp-dim); }
+  .chart .path { fill: none; stroke: var(--brass); stroke-width: 1; opacity: .7; }
+  .chart .num { font-family: var(--body); font-size: 11px; fill: var(--brass); }
+  .chart a { cursor: pointer; outline: none; }
+  .chart .hit { fill: transparent; }
+  .chart .dot { fill: var(--star); transition: r .15s; }
+  .chart .ring { fill: none; stroke: var(--brass); stroke-width: 1; opacity: 0; transition: opacity .15s; }
+  .chart a:hover .ring, .chart a:focus-visible .ring, .chart a.on .ring { opacity: 1; }
+  .chart a:focus-visible .ring { stroke: var(--star); stroke-width: 2; }
+  .chart a.upcoming .dot { fill: none; stroke: var(--star); stroke-width: 1.5; }
+  .readout {
+    border-top: 1px solid var(--brass); padding-top: 1rem;
+    min-height: 16rem;
+  }
+  .readout .r-date { color: var(--brass); font-size: .95rem; margin: 0; }
+  .readout h3 { margin: .25rem 0 .5rem; font-size: 1.55rem; line-height: 1.15; }
+  .readout .r-who { margin: 0 0 1rem; font-size: .98rem; }
+  .readout .r-place { margin: 0 0 1rem; font-size: .9rem; color: var(--lamp-dim); }
+
+  .log-list { max-width: 1200px; margin: 2.5rem auto 0; padding: 0; list-style: none; columns: 2; column-gap: 3rem; }
+  .log-list[hidden] { display: none; }
+  .log-list li { break-inside: avoid; padding: .85rem 0; border-top: 1px solid var(--rule); }
+  .log-list .l-date { display: block; font-size: .9rem; color: var(--brass); }
+  .log-list a { font-family: var(--display); font-size: 1.25rem; line-height: 1.25; text-decoration: none; }
+  .log-list a:hover { text-decoration: underline; }
+  .log-list .l-who { display: block; font-size: .95rem; color: var(--lamp-dim); }
+
+  /* ---------- join / contact ---------- */
+  .join { background: var(--lamp); color: var(--ink); }
+  .join h2, .join h3 { color: var(--ink); }
+  .join a { color: var(--ink); text-decoration-color: var(--ink); }
+  .join a:hover { color: var(--dusk); }
+  .join .bearing li { border-color: rgba(23, 34, 74, .25); }
+  .join .bearing li::before { background: var(--ink); }
+  .join :focus-visible { outline-color: var(--ink); }
+  .cta {
+    display: inline-block; margin-top: 1.75rem;
+    background: var(--ink); color: var(--lamp) !important; text-decoration: none;
+    padding: .8rem 1.4rem; border-radius: 999px; font-weight: 500;
+  }
+  .cta:hover { background: var(--dusk); }
+
+  /* ---------- sponsor ---------- */
+  .sponsor-logo {
+    width: min(260px, 70%); height: auto; display: block; margin: 0 0 1.5rem;
+    filter: invert(1) grayscale(1) brightness(1.15); mix-blend-mode: screen;
+  }
+  details { margin-top: 1.25rem; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  summary {
+    cursor: pointer; padding: .9rem 0; color: var(--star); font-weight: 500;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--display); font-size: 1.6rem; line-height: 1; color: var(--brass); transition: transform .2s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details > div { padding: 0 0 1.25rem; }
+  .contact-list { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .35rem; }
+  .contact-list span { color: var(--lamp-dim); display: inline-block; min-width: 5.5rem; }
+
+  /* ---------- footer ---------- */
+  footer {
+    padding: 3rem var(--gutter) 2.5rem;
+    border-top: 1px solid var(--rule);
+    display: flex; justify-content: space-between; gap: 2rem; flex-wrap: wrap; align-items: end;
+  }
+  footer .f-name { font-family: var(--display); font-size: 1.6rem; color: var(--star); margin: 0; }
+  footer .f-tag { margin: .2rem 0 0; color: var(--lamp-dim); }
+  footer ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; }
+  footer small { display: block; width: 100%; color: var(--lamp-dim); font-size: .85rem; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-top: 1rem; }
+    .hero-text { padding-bottom: 0; }
+    .chapter { grid-template-columns: 1fr; }
+    .chart-wrap { grid-template-columns: 1fr; }
+    .readout { min-height: 0; }
+  }
+  @media (max-width: 700px) {
+    body { font-size: 1rem; }
+    .bar nav ul { gap: 1rem; }
+    .pair { grid-template-columns: 1fr; gap: 2rem; }
+    .chart-wrap, .toggle, .chart-hint { display: none; }
+    .log-list, .log-list[hidden] { display: block; columns: 1; margin-top: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <a class="mark" href="#top">Cville AI Explorers</a>
+  <nav aria-label="Sections">
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#log">Past meetups</a></li>
+      <li><a href="#join">Join us</a></li>
+      <li><a href="#sponsor">Sponsor</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="site-name">
+    <div class="hero-text">
+      <h1 id="site-name">Cville AI <span class="line2">Explorers</span></h1>
+      <p class="tagline">Building with AI in Charlottesville, Virginia</p>
+      <p class="reading">From Charlottesville the North Star stands 38° above the horizon, the same as our latitude. Navigators used that angle to find where they were. We meet monthly to work out where we are with AI.</p>
+
+      <div class="fix" id="next" data-date="2026-07-28" data-href="https://www.meetup.com/cville-tech/events/315584929/">
+        <span class="fix-label">Next meetup</span>
+        <a class="fix-date" href="https://www.meetup.com/cville-tech/events/315584929/">July 28, 2026</a>
+        <span class="fix-note" hidden></span>
+      </div>
+    </div>
+
+    <svg class="sky" viewBox="0 0 1000 640" role="img" aria-label="A sextant arc measuring 38 degrees from the Blue Ridge horizon up to the North Star">
+      <!-- faint background stars: sparse, printed-chart style -->
+      <g fill="#FFF8EA" opacity=".55">
+        <circle cx="820" cy="80" r="1.4"/><circle cx="930" cy="190" r="1"/><circle cx="700" cy="60" r="1"/>
+        <circle cx="360" cy="140" r="1.2"/><circle cx="880" cy="330" r="1"/><circle cx="470" cy="90" r="1"/>
+        <circle cx="960" cy="420" r="1.2"/><circle cx="250" cy="260" r="1"/><circle cx="760" cy="250" r="1"/>
+      </g>
+      <!-- Little Dipper hint leading to Polaris -->
+      <g class="reveal" stroke="#D4A24C" stroke-width="1" fill="none" opacity=".75">
+        <polyline points="579,178 640,166 690,170 735,158 790,176 815,130 762,112 735,158"/>
+      </g>
+      <g class="reveal" fill="#FFF8EA">
+        <circle cx="640" cy="166" r="1.8"/><circle cx="690" cy="170" r="2"/><circle cx="735" cy="158" r="2"/>
+        <circle cx="790" cy="176" r="1.8"/><circle cx="815" cy="130" r="2.4"/><circle cx="762" cy="112" r="2.6"/>
+      </g>
+
+      <!-- graduated scale, 0–60° -->
+      <g transform="translate(90 560)">
+        <path d="M 620 0 A 620 620 0 0 0 310 -536.9" fill="none" stroke="#D4A24C" stroke-width="1" opacity=".55"/>
+        <g id="ticks" stroke="#D4A24C" stroke-width="1"></g>
+        <g id="ticklabels"></g>
+        <!-- measured arc, 0–38° at radius 620 (length ≈ 412) -->
+        <path class="measured" d="M 620 0 A 620 620 0 0 0 488.6 -381.7" fill="none" stroke="#FFF8EA" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- horizon line -->
+        <line x1="0" y1="0" x2="880" y2="0" stroke="#D4A24C" stroke-width="1" stroke-dasharray="3 6"/>
+        <!-- index arm -->
+        <g class="arm">
+          <line x1="0" y1="0" x2="660" y2="0" stroke="#FFF8EA" stroke-width="1.25"/>
+        </g>
+        <!-- small inner angle arc -->
+        <path class="reveal" d="M 150 0 A 150 150 0 0 0 118.2 -92.3" fill="none" stroke="#D4A24C" stroke-width="1"/>
+        <text class="reveal big" x="160" y="-34">38°</text>
+        <circle r="5" fill="#D4A24C"/>
+      </g>
+
+      <!-- Polaris at 38°, r=620 → (90+488.6, 560-381.7) -->
+      <g class="polaris-glint">
+        <path d="M578.6 158.3 L582 174.9 L598.6 178.3 L582 181.7 L578.6 198.3 L575.2 181.7 L558.6 178.3 L575.2 174.9 Z" fill="#FFF8EA"/>
+      </g>
+      <text class="reveal star-label" x="556" y="214" text-anchor="end">Polaris</text>
+      <text x="998" y="530" text-anchor="end" class="deg">Blue Ridge, looking north, 38.03° N</text>
+    </svg>
+    <svg class="ridge" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 64 L0 26 C 120 18 200 30 320 22 C 440 14 500 6 620 12 C 720 17 780 24 880 18 C 980 12 1060 4 1160 10 C 1260 16 1320 22 1440 14 L1440 64 Z" fill="#17224A"/>
+      <path d="M0 26 C 120 18 200 30 320 22 C 440 14 500 6 620 12 C 720 17 780 24 880 18 C 980 12 1060 4 1160 10 C 1260 16 1320 22 1440 14" fill="none" stroke="#D4A24C" stroke-width="1" vector-effect="non-scaling-stroke" opacity=".6"/>
+    </svg>
+  </section>
+
+  <section id="about" aria-labelledby="about-h">
+    <div class="chapter">
+      <h2 id="about-h">About us</h2>
+      <div class="prose">
+        <p>We are a group of builders, learners, and enthusiasts who gather to:</p>
+        <ul class="bearing">
+          <li>Build practical AI applications and tools</li>
+          <li>Share technical knowledge and implementation experiences</li>
+          <li>Learn about and explore emerging AI technologies</li>
+          <li>Discover ways to enhance productivity and creativity</li>
+          <li>Support each other in creating AI-powered solutions</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission" aria-labelledby="mission-h">
+    <div class="chapter">
+      <h2 id="mission-h">Our mission</h2>
+      <blockquote>Our mission is to foster a community where people can develop AI building skills through hands-on projects, technical sharing, and collaborative learning, and discover practical ways to integrate AI tools into their work and daily lives. While our focus is on active building and implementation, we welcome anyone interested in learning these skills.</blockquote>
+    </div>
+  </section>
+
+  <section aria-labelledby="activities-h">
+    <div class="chapter">
+      <h2 id="activities-h">Activities and directions</h2>
+      <div class="prose">
+        <ul class="bearing" style="margin-top:0">
+          <li>Exploring modern AI platforms and workflow tools</li>
+          <li>Technical demos and talks from AI builders</li>
+          <li>Technical book discussions and learning circles</li>
+          <li>Collaborative building sessions and group projects</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="log" aria-labelledby="log-h">
+    <div class="log-head">
+      <div>
+        <h2 id="log-h">Where we’ve been</h2>
+        <p>Every meetup since March 2025, charted in order.<span class="chart-hint"> Hover over a star or tab to it to read the entry.</span></p>
+      </div>
+      <button class="toggle" type="button" aria-expanded="false" aria-controls="log-list">Show as a list</button>
+    </div>
+    <div class="chart-wrap">
+      <svg class="chart" id="chart" viewBox="0 0 900 440" aria-labelledby="chart-title">
+        <title id="chart-title">Chart of past meetups, March 2025 to September 2026</title>
+        <g class="grid" id="grid"></g>
+        <polyline class="path" id="path"/>
+        <g id="stars"></g>
+      </svg>
+      <div class="readout" id="readout" aria-live="polite"></div>
+    </div>
+    <ol class="log-list" id="log-list" hidden></ol>
+  </section>
+
+  <section class="join" id="join" aria-labelledby="join-h">
+    <div class="chapter">
+      <h2 id="join-h">Join us</h2>
+      <div>
+        <div class="prose">
+          <p>Whether you’re actively building AI applications or eager to learn how, there’s a place for you in our community. We emphasize practical skills and implementation while maintaining an inclusive environment for learning.</p>
+        </div>
+        <div class="pair" style="margin-top:2.5rem">
+          <div>
+            <h3>Get involved</h3>
+            <ul class="bearing" style="margin-top:0">
+              <li>Attend our meetups</li>
+              <li>Share your AI experiences</li>
+              <li>Collaborate with other members</li>
+              <li>Present your projects or findings</li>
+              <li>Learn from peers</li>
+            </ul>
+          </div>
+          <div id="contact">
+            <h3>Contact</h3>
+            <p style="margin:0">Cville AI Explorers operates under the <a href="https://www.meetup.com/cville-tech/">Charlottesville Technologists meetup</a>. Contact organizers in the <a href="https://cville.slack.com/archives/C08DTL1TS1K">#cvilleaiexplorers</a> channel on <a href="https://cville.slack.com">Cville Slack</a>.</p>
+            <a class="cta" href="https://www.meetup.com/cville-tech/">Join on Meetup</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sponsor" aria-labelledby="sponsor-h">
+    <div class="chapter">
+      <h2 id="sponsor-h">Our sponsors</h2>
+      <div class="prose">
+        <a href="https://www.studioix.co/"><img class="sponsor-logo" src="../../STUDIO_IX_Logo_White.jpg" alt="Studio IX" width="260" height="109"></a>
+        <p>Studio IX is a coworking space in downtown Charlottesville, Virginia, designed for freelancers, entrepreneurs, and remote workers.</p>
+        <details>
+          <summary>Learn more</summary>
+          <div>
+            <p>Studio IX offers a flexible shared office environment with options for open workspaces, dedicated desks, and private offices. The space fosters a collaborative community through weekly events and mixers, featuring a ‘warm industrial’ atmosphere with ample natural light.</p>
+            <p>Amenities include high-speed internet, soundproof phone booths, conference rooms, and premium coffee. Studio IX is staffed by a community manager on weekdays and provides 24/7 access for members.</p>
+            <p>Tours of the space are available; interested individuals can contact them via:</p>
+            <ul class="contact-list">
+              <li><span>Email</span> <a href="mailto:COWORK@STUDIOIX.CO">COWORK@STUDIOIX.CO</a></li>
+              <li><span>Phone</span> <a href="tel:+14342603803">434.260.3803</a></li>
+              <li><span>Website</span> <a href="https://www.studioix.co/">https://www.studioix.co/</a></li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="coc-h" style="padding-top:0">
+    <div class="chapter">
+      <h2 id="coc-h">Code of conduct</h2>
+      <p class="prose" style="margin:0">Cville AI Explorers follows the <a href="https://github.com/cville/conduct">Cville Slack Code of Conduct</a>.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>
+    <p class="f-name">Cville AI Explorers</p>
+    <p class="f-tag">Building with AI in Charlottesville, Virginia</p>
+  </div>
+  <ul>
+    <li><a href="https://www.meetup.com/cville-tech/">Meetup</a></li>
+    <li><a href="https://github.com/cvilleaiexplorers">GitHub</a></li>
+  </ul>
+  <small>© 2026 Cville AI Explorers. All rights reserved.</small>
+</footer>
+
+<script>
+(function () {
+  const ev = id => "https://www.meetup.com/cville-tech/events/" + id + "/";
+  const MEETUPS = [
+    { n: "1",  d: "2025-03-12", t: "Practical AI in Practice", w: "Owen Zanzal", u: ev(306249129) },
+    { n: "2",  d: "2025-04-22", t: "What is Prompt Engineering?", w: "John Berryman", u: ev(306883862) },
+    { n: "3",  d: "2025-05-13", t: "From Fuzz to Function: AI for Next-Gen Apps", w: "Justin Schroeder", u: ev(307524157) },
+    { n: "4",  d: "2025-06-24", t: "Building Ladders: Extending Human Agency with AI", w: "Dylan Isaac", u: ev(308180495) },
+    { n: "5",  d: "2025-07-22", t: "Demo Day", w: "Emily Smith, Michael Pfaffenberger, James Kovalenko", u: ev(308845984), big: true },
+    { n: "6",  d: "2025-08-26", t: "Transparent AI: Tools and Techniques for Taking the BS out of AI Adoption", w: "Dan Funk", u: ev(310284299) },
+    { n: "L&L", d: "2025-09-16", t: "Your README Has a Voice: Turning Repos Into Narrated Onboarding Tools", w: "Owen Zanzal", u: ev(310875883), place: "Virtual lunch & learn, online" },
+    { n: "7",  d: "2025-09-23", t: "What AI Teams Get Wrong about Vector Search", w: "Doug Turnbull", u: ev(310918482) },
+    { n: "8",  d: "2025-10-28", t: "From Reactive Tools to Proactive Teammates: The Next Shift in AI", w: "Michael J. (MJP) Prichard", u: ev(311437722) },
+    { n: "9",  d: "2025-12-09", t: "Tuning the Tuners: Building a Multi-Agent System for Search Relevance Optimization", w: "Eric Pugh", u: ev(311953873) },
+    { n: "10", d: "2026-02-10", t: "Transformers Explained", w: "Nish Tahir", u: ev(312664370) },
+    { n: "11", d: "2026-03-24", t: "Demo Day", w: "Eugene Geis, Macon Pegram, Nish Tahir, Paul Otto, Jill Heinze", u: ev(313423846), big: true },
+    { n: "12", d: "2026-04-28", t: "Security in the Age of AI", w: "Panel of security, cloud, and AI practitioners. One-year birthday meetup.", u: ev(314080035), big: true },
+    { n: "13", d: "2026-05-19", t: "Show Us Your Skills", w: "Mike Powers, plus community lightning talks", u: ev(314635275) },
+    { n: "14", d: "2026-06-30", t: "OpenClaw and Other Continuous AI Agents", w: "John Athayde, Owen Zanzal, Stephen Levin", u: ev(315069497) },
+    { n: "15", d: "2026-07-28", t: "Building a Second Brain / Domain-Specific Agents", w: "Kyle Carmitchel, Justin Schroeder", u: ev(315584929) },
+    { n: "16", d: "2026-08-27", t: "Breaking Into Data Science & AI Engineering", w: "Kerry Guerrero, Hunter Moore, Cory Everington, Patrick Harrison", u: ev(316018645), place: "UVA School of Data Science, 1919 Ivy Rd" },
+    { n: "17", d: "2026-09-29", t: "AI Design Bake-Off: Hands-On with AI Design Tools", w: "Hands-on team session led by volunteer team leads", u: ev(316395613) }
+  ];
+  // Hand-set heights so the line reads as a constellation, not a chart line.
+  const Y = [300, 230, 262, 170, 118, 160, 244, 208, 290, 250, 150, 96, 136, 214, 186, 270, 330, 292];
+
+  const params = new URLSearchParams(location.search);
+  const isoToday = () => {
+    const t = new Date();
+    return t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
+  };
+  const today = /^\d{4}-\d{2}-\d{2}$/.test(params.get("today") || "") ? params.get("today") : isoToday();
+  const fmt = (iso, opts) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", opts || { month: "long", day: "numeric", year: "numeric" });
+
+  /* ----- next meetup fix ----- */
+  const fix = document.getElementById("next");
+  const link = fix.querySelector(".fix-date");
+  const note = fix.querySelector(".fix-note");
+  let date = fix.dataset.date;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(params.get("date") || "")) date = params.get("date");
+  if (date < today) {
+    fix.dataset.state = "tba";
+    link.textContent = "TBA: Check Meetup Page";
+    link.href = "https://www.meetup.com/cville-tech/";
+    note.textContent = "The next date is being set. The Meetup group will have it first.";
+    note.hidden = false;
+  } else {
+    fix.dataset.state = "dated";
+    link.textContent = fmt(date);
+    link.href = fix.dataset.href;
+  }
+
+  /* ----- constellation ----- */
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  const x0 = 40, x1 = 860;
+  const t0 = new Date("2025-03-01").getTime(), t1 = new Date("2026-10-01").getTime();
+  const xOf = iso => x0 + (new Date(iso).getTime() - t0) / (t1 - t0) * (x1 - x0);
+
+  const grid = document.getElementById("grid");
+  el("line", { x1: x0, x2: x1, y1: 390, y2: 390 }, grid);
+  for (let y = 2025, m = 2; ; ) {
+    const iso = y + "-" + String(m + 1).padStart(2, "0") + "-01";
+    if (new Date(iso).getTime() > t1) break;
+    const x = xOf(iso);
+    const isQuarter = m % 3 === 0;
+    el("line", { x1: x, x2: x, y1: 390, y2: isQuarter ? 380 : 385 }, grid);
+    if (m === 0 || (y === 2025 && m === 2)) {
+      el("line", { x1: x, x2: x, y1: 60, y2: 390, "stroke-dasharray": "2 6" }, grid);
+      const tx = el("text", { x: x + 6, y: 412 }, grid);
+      tx.textContent = fmt(iso, { month: "short", year: "numeric" });
+    } else if (isQuarter && !(y === 2025 && m === 3)) {
+      const tx = el("text", { x: x - 10, y: 412 }, grid);
+      tx.textContent = fmt(iso, { month: "short" });
+    }
+    m++; if (m > 11) { m = 0; y++; }
+  }
+
+  const field = el("g", { fill: "#FFF8EA", opacity: ".35" }, grid);
+  [[120,90],[210,340],[300,70],[380,300],[470,120],[520,360],[610,60],[660,330],[760,80],[820,360],[150,200],[560,210]]
+    .forEach(([x, y], i) => el("circle", { cx: x, cy: y, r: i % 3 ? .9 : 1.3 }, field));
+  const pts = MEETUPS.map((m, i) => [xOf(m.d), Y[i]]);
+  document.getElementById("path").setAttribute("points", pts.map(p => p.join(",")).join(" "));
+
+  const stars = document.getElementById("stars");
+  const readout = document.getElementById("readout");
+  const show = (m, a) => {
+    stars.querySelectorAll("a.on").forEach(n => n.classList.remove("on"));
+    if (a) a.classList.add("on");
+    const up = m.d >= today;
+    readout.replaceChildren();
+    const p1 = document.createElement("p"); p1.className = "r-date";
+    p1.textContent = (m.n === "L&L" ? "Virtual lunch & learn" : "Meeting " + m.n) + ", " + fmt(m.d, { weekday: "short", month: "short", day: "numeric", year: "numeric" }) + (up ? " (upcoming)" : "");
+    const h = document.createElement("h3"); h.textContent = m.t;
+    const p2 = document.createElement("p"); p2.className = "r-who"; p2.textContent = m.w;
+    readout.append(p1, h, p2);
+    if (m.place) { const p3 = document.createElement("p"); p3.className = "r-place"; p3.textContent = m.place; readout.append(p3); }
+    const l = document.createElement("a"); l.href = m.u; l.textContent = "Event page"; readout.append(l);
+  };
+
+  MEETUPS.forEach((m, i) => {
+    const [x, y] = pts[i];
+    const a = el("a", { href: m.u, "aria-label": fmt(m.d) + ": " + m.t + ". " + m.w }, stars);
+    if (m.d >= today) a.classList.add("upcoming");
+    el("circle", { class: "hit", cx: x, cy: y, r: 16 }, a);
+    el("circle", { class: "ring", cx: x, cy: y, r: 11 }, a);
+    el("circle", { class: "dot", cx: x, cy: y, r: m.big ? 5 : 3.4 }, a);
+    const label = el("text", { class: "num", x: x + 8, y: y - 9 }, a);
+    label.textContent = m.n;
+    const go = () => show(m, a);
+    a.addEventListener("mouseenter", go);
+    a.addEventListener("focus", go);
+  });
+  const lastIdx = MEETUPS.length - 1;
+  show(MEETUPS[lastIdx], stars.children[lastIdx]);
+
+  /* ----- list fallback ----- */
+  const list = document.getElementById("log-list");
+  MEETUPS.slice().reverse().forEach(m => {
+    const li = document.createElement("li");
+    const s = document.createElement("span"); s.className = "l-date";
+    s.textContent = fmt(m.d) + (m.n === "L&L" ? ", virtual lunch & learn" : "");
+    const a = document.createElement("a"); a.href = m.u; a.textContent = m.t;
+    const w = document.createElement("span"); w.className = "l-who"; w.textContent = m.w;
+    li.append(s, a, w);
+    list.append(li);
+  });
+  const toggle = document.querySelector(".toggle");
+  toggle.addEventListener("click", () => {
+    const open = list.hidden;
+    list.hidden = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.textContent = open ? "Hide the list" : "Show as a list";
+  });
+
+  /* ----- scale ticks on the sextant arc ----- */
+  const ticks = document.getElementById("ticks"), labels = document.getElementById("ticklabels");
+  for (let deg = 0; deg <= 60; deg += 2) {
+    const r = Math.PI * deg / 180, c = Math.cos(r), s = Math.sin(r);
+    const len = deg % 10 === 0 ? 18 : 8;
+    el("line", { x1: 620 * c, y1: -620 * s, x2: (620 + len) * c, y2: -(620 + len) * s }, ticks);
+    if (deg % 10 === 0) {
+      const t = el("text", { class: "deg", x: 652 * c, y: -652 * s + 4, "text-anchor": "middle" }, labels);
+      t.textContent = deg + "°";
+    }
+  }
+})();
+</script>
+</body>
+</html>
