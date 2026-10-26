@@ -1,0 +1,497 @@
+# The viewer's own words, keyed by design slug. build.py merges this with the
+# team cards' front matter (title, lead, url, source), which stays the source of
+# truth for metadata. Text fields take inline Markdown.
+#
+# figures: `src` is relative to the design's folder; `capture` is relative to
+# viewer/captures/. `link` (relative to the design's folder, or a full URL)
+# is where the figure opens; it defaults to the original image.
+
+site:
+  title: Six designs, and how each team got there
+  lede: >-
+    Five teams rebuilt our website from its text alone, each with a different set
+    of AI tools. **Next, we'll build one new design from the best pieces of all six,**
+    so tell us about specific elements: a palette, a layout, a bit of motion, what
+    works and what doesn't. “TBA” next-meetup slots are expected in these mockups.
+  event: Sep 29, 2026, at Studio IX
+  feedback_url: https://bit.ly/cvaiex-design-feedback
+  feedback_title: Tell us what to keep
+  feedback_text: >-
+    We're not picking a winner. **Name the pieces of each design you like and the
+    ones you don't,** and we'll build the new one from them.
+  repo: https://github.com/cvilleaiexplorers/cvaiex-events/blob/main/2026-09-design-bakeoff/showcase/
+
+# Tool names that get a link wherever "Made with" lists them.
+tool_links:
+  Impeccable: https://impeccable.style
+  Mobbin MCP: https://mobbin.com
+  OpenCode: https://opencode.ai
+
+designs:
+  blue-ridge-at-dusk:
+    tools: [Claude Code, Impeccable]
+    site_query: "?next=2026-10-28"
+    idea: >-
+      A live particle field shaped like the ridgelines west of Charlottesville, in
+      haze blue, with one ember accent kept for the next-meetup date, the Join
+      buttons and a setting sun.
+    steps:
+      - label: Interview and product brief
+        text: >-
+          Impeccable scanned the repo and interviewed the team, then wrote a product
+          brief: two equal audiences, active builders and curious newcomers, plus the
+          anti-goals and the content rules.
+      - label: Seven concepts, one WebGL challenger
+        text: >-
+          It drew seven concepts from the group's own world, rolled dice to pick a
+          lead and dealt outside styles beside it. The team found the literal
+          concepts contrived and took the WebGL Shader Portal challenger, grounded
+          locally as “Blue Ridge at dusk.”
+      - label: Room feedback moved About above the fold
+        text: >-
+          Screenshots, a design linter and a reviewer subagent tightened the build
+          over several rounds. Then people in the room asked for About Us on the
+          first screen and one action per state, which gave the clearest wins.
+    palette:
+      - [void, "#070a12"]
+      - [mist, "#e4eaf6"]
+      - [haze, "#8ea7d6"]
+      - [deep haze, "#3b5588"]
+      - [ember, "#ff6a3d"]
+    elements:
+      - name: Type
+        text: >-
+          Sofia Sans Extra Condensed, in caps at poster scale, for the name, headings
+          and the date; regular Sofia Sans for reading.
+      - name: Motion
+        text: >-
+          The field drifts along the ridges as you scroll and parts under a cursor or
+          finger. Where text meets the mountains, the haze thins behind it.
+      - name: First screen
+        text: >-
+          Name, tagline and About on the left; the next-meetup date at hero scale on
+          the right. On a phone: name, date, actions, then About.
+      - name: Next meetup
+        text: >-
+          “TBA” is a designed state with one action, Check Meetup Page. Once a date
+          is posted, the action becomes Join us on Meetup.
+    journey:
+      intro: >-
+        Impeccable left a trail of working files: the product brief, the round of
+        directions it dealt, the direction the team committed to, and the final
+        screenshots.
+      teaser_line: >-
+        The product brief, the eight directions Impeccable dealt, the one the team
+        took, and the finished screens.
+      teaser: [direction-round.png, desktop-fold.png, desktop-dated-fold.png, mobile-dated-fold.png]
+      sections:
+        - title: The product brief
+          text: >-
+            `/impeccable init` interviewed the team and wrote [PRODUCT.md](journey/PRODUCT.md):
+            who the site is for, what it must do (show the next date or say it's TBA,
+            then route people to Meetup and Slack), and what to avoid: AI-startup gloss,
+            AI-slop copy, a corporate look and insider signals.
+        - title: The direction round
+          text: >-
+            `/impeccable shape` rolled for a lead direction, The Shadow Board, and
+            Impeccable put forward its own pick, The Wall Calendar. Six challengers
+            from outside the group's world were dealt beside them. The team set the
+            literal concepts aside and took the WebGL Shader Portal.
+          figures:
+            - src: journey/direction-round.png
+              caption: The decision page as Impeccable showed it.
+          cards: direction-round
+        - title: The committed direction
+          text: >-
+            On Impeccable's advice, the Shader Portal was grounded in the place:
+            a living particle field of the ridgelines west of town, haze blue in
+            place of the usual AI lilac, and ember kept for the date, the Join
+            actions and the dusk sun. The [direction contract](journey/direction-contract.md)
+            sets the first screen down to where the far ridge sits.
+        - title: Checks, then the room
+          text: >-
+            The agent screenshotted its own work at desktop and phone widths, ran a
+            design linter, and had a reviewer subagent score fixes over several
+            rounds. Pills became hairline rows, the fonts were self-hosted in case
+            the venue Wi-Fi failed, and the sun was kept from ever sitting behind text.
+
+
+            People in the room then asked for About Us above the fold. The mountains
+            now thin behind the text instead of shrinking, the three nearby Meetup
+            links became one action per state, and the next-meetup block moved to the top.
+        - title: Finished, TBA and dated
+          text: >-
+            The final captures, at desktop, laptop and phone widths, in the TBA state
+            and with a date filled in (previewed with `?next=2026-10-27`). Each opens
+            the full page.
+          layout: gallery
+          figures:
+            - src: journey/screenshots/desktop-fold.png
+              link: journey/screenshots/desktop.png
+              caption: Desktop, TBA
+            - src: journey/screenshots/desktop-dated-fold.png
+              link: journey/screenshots/desktop-dated.png
+              caption: Desktop, dated
+            - src: journey/screenshots/laptop-1280-fold.png
+              link: journey/screenshots/laptop-1280.png
+              caption: Laptop, TBA
+            - src: journey/screenshots/laptop-1280-dated-fold.png
+              link: journey/screenshots/laptop-1280-dated.png
+              caption: Laptop, dated
+            - src: journey/screenshots/mobile-fold.png
+              link: journey/screenshots/mobile.png
+              caption: Phone, TBA
+              phone: true
+            - src: journey/screenshots/mobile-dated-fold.png
+              link: journey/screenshots/mobile-dated.png
+              caption: Phone, dated
+              phone: true
+
+  community-bulletin-board:
+    tools: [ChatGPT Images, Claude Code]
+    idea: >-
+      The homepage as a community bulletin board: bold condensed type beside
+      hand-drawn marks, on sections that alternate ink, cream and signal orange.
+      The next-meetup card comes first.
+    steps:
+      - label: Qualities into a mood board
+        text: >-
+          Jill and Nish listed the qualities they wanted (curious, open, member-driven,
+          rooted in Charlottesville) and had ChatGPT turn them into an image-generated
+          mood board.
+      - label: "Critique: too touristy, not techy enough"
+        text: >-
+          The first board leaned toward local atmosphere and underplayed a group
+          exploring new technology. They kept the people with laptops and pushed for
+          contrast, heavier type and visible AI and coding cues.
+      - label: Bolder board, built in Claude Code
+        text: >-
+          The revised board set the character, and they built the site in Claude
+          Code, trading photos of people for hand-drawn marks.
+    palette:
+      - [ink, "#121418"]
+      - [cream, "#F4EFE6"]
+      - [signal orange, "#FF5A2E"]
+      - [blue, "#1454F5"]
+      - [teal, "#1F8A95"]
+      - [mint, "#8FE3D3"]
+    elements:
+      - name: Type
+        text: >-
+          Four faces with clear jobs: Barlow Condensed for big statements, Fraunces
+          for headings, Barlow for body text and Caveat for handwritten notes.
+      - name: Hand-drawn marks
+        text: >-
+          Brush underlines, sketched checkboxes, a curved arrow, sticky notes,
+          contour lines and a dot grid, used as accents against a strict type system.
+      - name: First screen
+        text: >-
+          The group name and a one-line welcome beside a “Next meetup” card with the
+          date, venue and an RSVP button, or “TBA: Check Meetup Page.”
+      - name: History
+        text: >-
+          Every past meetup as a linked card, newest first, under a “since March
+          2025” headline and two stats.
+    journey:
+      intro: >-
+        This team started from pictures, not code. The two mood boards they made in
+        ChatGPT show the turn that set the design's character.
+      teaser_line: >-
+        Both ChatGPT mood boards, the critique that changed them, and the site they
+        became.
+      teaser: [initial-mood-board.png, revised-mood-board.png, cover.png]
+      sections:
+        - title: From qualities to a first board
+          text: >-
+            They began with the current site, two reference sites they disliked, and
+            a list of qualities: curious, learning-oriented, open, empowering, organic,
+            member-driven, people-centered and connected to Charlottesville. The first
+            spec framed the site as a warm local learning community, not a polished
+            tech conference, and the first board made that tangible.
+          figures:
+            - src: journey/initial-mood-board.png
+              caption: "The first board: people learning together, brick and natural textures, warm neutrals, handwritten notes, Lora with Inter."
+        - title: “Too touristy”
+          text: >-
+            Looking at it, the team felt the board leaned toward tourism and local
+            atmosphere and underplayed the energy of a group exploring new
+            technology. They kept the people-with-laptops imagery and asked for more
+            contrast, stronger type, brighter accents, visible AI and coding cues,
+            and a more energetic composition.
+          figures:
+            - src: journey/revised-mood-board.png
+              caption: "The revised board: heavier type, orange, teal and blue accents, and visible coding cues."
+        - title: From boards to build
+          text: >-
+            They built the site in Claude Code from the boards and the spec. The build
+            trades the boards' Lora and Inter for Barlow Condensed, Fraunces, Barlow
+            and Caveat, and replaces the photos of people with hand-drawn marks.
+          figures:
+            - src: cover.png
+              link: site/
+              caption: The finished first screen. Opens the site.
+
+  cosmic-city:
+    tools: [OpenCode]
+    idea: >-
+      Charlottesville's real buildings float under a live star field. You pick a
+      venue, fly there, and walk inside a stylized community room or along the
+      Downtown Mall.
+    steps:
+      - label: Public map and building data
+        text: >-
+          Travis worked in OpenCode, an open-source coding agent, and imported the
+          City of Charlottesville's building footprints and streets and a real star
+          catalog.
+      - label: Staged preview-and-feedback rounds
+        text: >-
+          Each stage ended in a preview and a feedback round. The green palette and
+          a star sky kept as “a subtle background Easter egg” both came out of those
+          rounds.
+      - label: Fly over, then walk the Mall
+        text: >-
+          The finished explorer orbits the city, flies to each venue and walks the
+          Mall, with ordinary crawlable pages behind it. Every event, venue and photo
+          records where it came from.
+    palette:
+      - [ground, "#0c131b"]
+      - [panel, "#142126"]
+      - [text, "#eef2ed"]
+      - [secondary, "#9ba8aa"]
+      - [lime, "#b6f36a"]
+    elements:
+      - name: Navigation
+        text: >-
+          Real places are the menu: pick Studio IX, UVA or Kardinal Hall and the
+          camera flies there, or take a five-stop guided tour that pauses when you
+          step in.
+      - name: Discovery dock
+        text: >-
+          A search box (“Find a place, a meetup, a spark of inspiration…”) with a
+          microphone for voice search.
+      - name: Type
+        text: >-
+          Space Grotesk for headings, DM Sans for body text and small tracked
+          monospace capitals for labels and coordinates.
+      - name: Sources on everything
+        text: >-
+          Each event carries the date it was checked, each venue says whether its pin
+          is approximate, and the site says plainly where its coverage is incomplete.
+
+  flyover:
+    tools: [Claude Code]
+    idea: >-
+      The CvAIE logo becomes the ground. Rebuilt from tiles over real elevation, it
+      carries you down across a ridge and over Charlottesville's actual buildings as
+      you scroll, and the content lands as four cards at the end.
+    steps:
+      - label: Three concepts, harsh critique
+        text: >-
+          Eugene prompted Claude Code directly, with no design skill. The brief asked
+          for three genuinely different concepts, a harsh critique pass and a
+          phone-width check.
+      - label: Fly along the logo
+        text: >-
+          The concept he took: “the logo *is* the water; you dive and fly along it.”
+      - label: Real terrain and city, all scroll-driven
+        text: >-
+          The water became real USGS elevation, Charlottesville's buildings came over
+          from Cosmic City, and all self-running motion was removed, so a still
+          scroll position is a still frame.
+    palette:
+      - [ground, "#061426"]
+      - [land, "#123f6b"]
+      - [streets, "#2f7fcc"]
+      - [text, "#f2f6fb"]
+      - [orange, "#FA6107"]
+    elements:
+      - name: The logo as land
+        text: >-
+          About 193,000 tiles carry the logo's colors at each spot, laid over a real
+          ten-mile square of Albemarle County.
+      - name: The flight
+        text: >-
+          About seven and a half screens of scrolling with nothing else on screen:
+          dive, skim the ground, climb Carter Mountain, then drop toward downtown.
+      - name: Content deck
+        text: >-
+          Four cards fly in and settle in a row over downtown: Our Mission, What We
+          Do, Join Us and Get Involved.
+      - name: Measured color
+        text: >-
+          The orange was taken from the logo, where 90% of the orange pixels share
+          one value.
+
+  focus:
+    tools: [Codex]
+    idea: >-
+      A dark olive page with a single lime accent, built around a glowing
+      filament-knot artwork. The next meetup comes live from Meetup, followed by
+      three past-meetup cards.
+    steps:
+      - label: Public research on the group
+        text: >-
+          Sifan had Codex research the community from public sources. The
+          direction came from a local reference: the Ix site's textile-mill history.
+      - label: Generated artwork, hand-coded site
+        text: >-
+          Codex generated the filament-knot artwork, strands woven into one form, and
+          wrote the site in plain HTML, CSS and JavaScript with no framework.
+      - label: Cut copy, next meetup live
+        text: >-
+          Sifan's direction was to cut repetitive copy, focus on what a visitor
+          needs and pull the next meetup straight from Meetup.
+    palette:
+      - [ground, "#121510"]
+      - [rules, "#343a2c"]
+      - [text, "#f3f4eb"]
+      - [sage, "#b6bdaa"]
+      - [lime, "#d2f75a"]
+    elements:
+      - name: Hero art
+        text: >-
+          An AI-generated knot of luminous strands, referring to the textile mill
+          that once stood at the Ix site, under “Stay curious. Build together.”
+      - name: Next-meetup band
+        text: >-
+          A lime band with a huge day number, the event and RSVP, designed for four
+          states: fresh, stale, failed and nothing scheduled.
+      - name: Type
+        text: Space Grotesk headings in tight sentence case, DM Sans for body text.
+      - name: Phones
+        text: The art drops below the headline and the past-meetup cards scroll sideways.
+
+  ridgeline:
+    tools: [Claude Code, Mobbin MCP]
+    idea: >-
+      One scroll-driven descent, from the Blue Ridge crest at Humpback Rocks at dusk,
+      down through the night to the lights of Charlottesville, then indoors to the
+      room where the meetup happens. An altimeter counts down the feet.
+    steps:
+      - label: Mobbin references
+        text: >-
+          John's team worked in Claude Code with the Mobbin MCP server connected, so
+          the agent could pull real-world site examples.
+      - label: Three concepts side by side
+        text: >-
+          They built three directions as single HTML pages: Ridgeline, Field Map
+          and Polaris at 38°.
+      - label: One descent, dusk to downtown
+        text: >-
+          They picked Ridgeline and developed it over a few rounds into one scene
+          that scrolls from 3,080 ft down to 594 ft and steps inside.
+    palette:
+      - [night, "#131936"]
+      - [warm text, "#FFF6E8"]
+      - [marigold, "#F2A93B"]
+      - [wall, "#F5F5F1"]
+      - [oak, "#D4954E"]
+    elements:
+      - name: The altimeter
+        text: >-
+          A chip in the right margin counts down from 3,080 ft and lands at 594 ft
+          as the page goes indoors.
+      - name: Outdoors to indoors
+        text: >-
+          A white wall rises over the night for the content, and the sponsor gets
+          a warm oak room.
+      - name: Type
+        text: >-
+          Archivo throughout, with headlines at its widest setting in uppercase.
+          Section headings slide in from both sides and settle.
+      - name: Photos as atmosphere
+        text: Unframed photos with soft edges that drift and fade into the scene.
+    journey:
+      intro: >-
+        Ridgeline's earlier rounds and the two concepts it beat are still working
+        pages. The pictures below are their screens; each opens the page itself.
+      teaser_line: >-
+        Three concepts side by side, then three rounds of Ridgeline, each one a
+        page you can open.
+      teaser: [v1-000.webp, fieldmap-000.webp, polaris-000.webp, v3-070.webp]
+      sections:
+        - title: Three concepts
+          text: >-
+            With Mobbin references in hand, the team built three directions side by
+            side, each with the same TBA and dated next-meetup states. A small
+            [hub page](journey/) links them.
+        - title: "A. Ridgeline, first round"
+          text: >-
+            “Based on the Atlas reference”: Blue Ridge layers at dusk behind a
+            staggered, wide, uppercase headline and a survey grid, with the content
+            below on a light ground.
+          layout: pair
+          figures:
+            - capture: ridgeline/v1-000.webp
+              link: journey/ridgeline/v1.html
+              caption: The ridge hero.
+            - capture: ridgeline/v1-015.webp
+              link: journey/ridgeline/v1.html
+              caption: The content below.
+        - title: "B. Field Map"
+          text: >-
+            A printed topographic map of Charlottesville with the Rivanna River, a
+            pin at Studio IX, and a trail log of past meetups.
+          layout: pair
+          figures:
+            - capture: ridgeline/fieldmap-000.webp
+              link: journey/field-map/
+              caption: The map hero.
+            - capture: ridgeline/fieldmap-070.webp
+              link: journey/field-map/
+              caption: The trail log.
+        - title: "C. Polaris at 38°"
+          text: >-
+            Celestial navigation: a sextant measures Polaris at Charlottesville's
+            latitude, and the past meetups form a constellation.
+          layout: pair
+          figures:
+            - capture: ridgeline/polaris-000.webp
+              link: journey/polaris/
+              caption: The sextant hero.
+            - capture: ridgeline/polaris-050.webp
+              link: journey/polaris/
+              caption: Past meetups as a constellation.
+        - title: "Round two: one scene"
+          text: >-
+            They picked Ridgeline. In the second round the page became one scene:
+            scrolling descends from Humpback Rocks to downtown and drives the sky,
+            ridges, haze, stars, town lights and an altimeter.
+          layout: pair
+          figures:
+            - capture: ridgeline/v2-015.webp
+              link: journey/ridgeline/v2.html
+              caption: Partway down, the altimeter at 2,710 ft.
+            - capture: ridgeline/v2-090.webp
+              link: journey/ridgeline/v2.html
+              caption: Night, near the bottom.
+        - title: "Round three: indoors"
+          text: >-
+            The descent now ends inside. A white wall rises over the night for the
+            content sections, with framed photos, and the sponsor gets a warm oak room.
+          layout: trio
+          figures:
+            - capture: ridgeline/v3-030.webp
+              link: journey/ridgeline/v3.html
+              caption: Night over town.
+            - capture: ridgeline/v3-070.webp
+              link: journey/ridgeline/v3.html
+              caption: The white wall.
+            - capture: ridgeline/v3-090.webp
+              link: journey/ridgeline/v3.html
+              caption: The oak room.
+        - title: Finished
+          text: >-
+            In the final version the photos lose their frames and become soft-edged
+            backgrounds that drift and fade in.
+          layout: trio
+          figures:
+            - capture: ridgeline/final-015.webp
+              link: site/
+              caption: Next meetup, at night.
+            - capture: ridgeline/final-070.webp
+              link: site/
+              caption: Join Us, indoors.
+            - capture: ridgeline/final-090.webp
+              link: site/
+              caption: The oak room.

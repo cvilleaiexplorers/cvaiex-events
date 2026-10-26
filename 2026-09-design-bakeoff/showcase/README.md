@@ -4,6 +4,23 @@ What each team handed in after the bake-off: a deployable copy of every design i
 
 These folders feed a portfolio viewer and a later remix stage, so every team follows the same layout.
 
+## The viewer
+
+[`index.html`](index.html) is the showcase itself: every design with its cover, a link to the running site, a short account of how the team got there, and the feedback form. Each design has its own page (`<slug>.html`), and designs with working files have a journey page (`<slug>-journey.html`) that walks through them with screenshots.
+
+All of it is generated. Don't edit the HTML by hand; edit the sources and rebuild:
+
+- **[`viewer/copy.yaml`](viewer/copy.yaml):** the viewer's own words: summaries, steps, palettes, elements to look at, and the journey sections.
+- **Team cards:** titles, leads, live URLs and source repos come from the front matter below.
+- **[`viewer/captures/`](viewer/captures/):** screenshots we took of pages that had none, such as Ridgeline's earlier rounds.
+- **[`assets/`](assets/):** the stylesheet and the feedback QR code. `assets/img/` is build output.
+
+```
+uv run viewer/build.py
+```
+
+The viewer is plain static files with relative paths, served by GitHub Pages from the repo, so the `site/` builds open at their own subpaths beside it.
+
 ## Layout
 
 ```
