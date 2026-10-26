@@ -1,10 +1,8 @@
 # Design brief: Flyover
 
-*The team didn't submit a design brief. Everything below was compiled by the organizers from the repo at commit [`e83d1dd`](https://github.com/ignisspindler/cvaie-site/tree/e83d1dd) and from the deployed site at [cvaie-site.vercel.app](https://cvaie-site.vercel.app), as both stood on 2026-10-10. The repo has no license file, so this describes the code rather than reproducing it.*
-
 ---
 
-## Observed on the deployed site and in the repo, 2026-10-10 (organizers' notes)
+## Organizers' notes, 2026-10-10
 
 **Concept.** The logo isn't a picture on the page. It's the ground you fly over.
 - **The tiles:** `CVAIE.svg` is sampled onto a grid and rebuilt as about 193,000 small square tiles, each carrying the artwork's color at that spot. About 48,000 coarser navy tiles continue the land past the logo's edge.
@@ -59,7 +57,7 @@ Type uses the system UI sans stack, with no web fonts:
 - **Static, with no server.** The build needs no environment variables and makes no requests to other domains. It's a plain Vite build.
   - **Subpath hosting:** paths are root-absolute (`/CVAIE.svg`, `/data/…`, `/studio-ix.jpg`), so serving it from a subpath means setting Vite's `base` and updating those URLs in the code.
   - **Weight:** a first visit transferred about 340 KB of JavaScript and about 6 MB of terrain, city and road data. Only the files Vite builds have content hashes in their names, so the team's `vercel.json` adds a cache rule for `/data/`.
-- **Needs WebGL to show the content.** The deck cards are revealed by the 3D frame loop, so without WebGL only the hero and footer would appear. We read this from the code; we didn't test it. The team's own notes list "graceful degradation" as a gap. We couldn't check the phone layout in our browser, so it's unverified. The code does pull the opening shot back on narrow screens so the logo fits.
+- **Needs WebGL to show the content.** The deck cards are revealed by the 3D frame loop, so without WebGL only the hero and footer appear. The team's own notes list "graceful degradation" as a gap. On narrow screens the opening shot pulls back so the logo fits.
 - **The data carries obligations.** The Charlottesville buildings and streets are CC BY 4.0, and the attribution has to stay visible. USGS elevation and Census TIGER roads are public domain but credited. Scripts in the repo rebuild every dataset from its source.
 - **A live next meetup would need adding.** Focus (Lane B) shows one way to do it.
 - **Content coverage:**

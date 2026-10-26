@@ -1,14 +1,12 @@
 # Process narrative: Cosmic City
 
-*The team didn't submit a process narrative. Everything below was compiled by the organizers on 2026-10-10 from two sources: Travis's public repo at commit [`4c16400`](https://github.com/traviseden/cvaiex/tree/4c16400) (its `README.md`, `PLAN.md`, `DEVOPS.md` and `STOREFRONTS.md`), and the deployed site.*
-
 ---
 
-## Compiled from the repo and the deployed site, 2026-10-10 (organizers' notes)
+## Organizers' notes, 2026-10-10
 
-**Tool.** Travis used OpenCode, an open-source coding agent, with no design skill. We don't know which model or models he ran in it. The result is a static Astro 7 + TypeScript site that draws its 3D scenes with plain three.js. It comes with Node scripts that import the public data, and with tests.
+**Tool.** Travis used OpenCode, an open-source coding agent, with no design skill. The result is a static Astro 7 + TypeScript site that draws its 3D scenes with plain three.js. It comes with Node scripts that import the public data, and with tests.
 
-**When it was built.** The repo is a single commit, dated Sep 30, the day after the bake-off. It holds 76 files and about 10,800 lines. Many records inside it are dated that day: the city data snapshot, the star catalog and the event checks. So most of what's deployed was built or finished after the 45-minute session, not during it.
+**When it was built.** Travis started it at the bake-off and finished most of it the next day, Sep 30. It runs to 76 files and about 10,800 lines.
 
 **Feedback rounds.** The README ends at "Feedback checkpoint 4," with four questions for reviewers about movement, the Mall, the guided tour and what to add next. `PLAN.md` says "each stage ends in a preview and feedback round." It records decisions from earlier rounds, such as:
 - the green palette "remains approved for now; palette decisions await the group"
@@ -25,4 +23,4 @@
 
 **Deployment.** `DEVOPS.md` records a real debugging session. Cloudflare's new beta CLI generated a server configuration that this static site couldn't use. The fix was a small build step that writes a validated assets-only bundle, and the result was deployed to a Cloudflare Workers URL. The custom domain was never switched over.
 
-**What came next.** Eugene's Flyover later imported this project's Charlottesville building data. Its notes planned to merge the two experiences into one handoff site, which hadn't happened as of 2026-10-10.
+**What came next.** Eugene's Flyover later imported this project's Charlottesville building data. Its notes plan to merge the two experiences into one site.

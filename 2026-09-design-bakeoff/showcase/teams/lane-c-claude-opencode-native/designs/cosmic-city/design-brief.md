@@ -1,10 +1,8 @@
 # Design brief: Cosmic City
 
-*The team didn't submit a design brief. Everything below was compiled by the organizers from the repo at commit [`4c16400`](https://github.com/traviseden/cvaiex/tree/4c16400) and from the deployed site at [cvaiex.bfrtrcvxfg.workers.dev](https://cvaiex.bfrtrcvxfg.workers.dev), as both stood on 2026-10-10. The repo has no license file, so this describes the code rather than reproducing it.*
-
 ---
 
-## Observed on the deployed site and in the repo, 2026-10-10 (organizers' notes)
+## Organizers' notes, 2026-10-10
 
 **Concept.** "A little city. A big universe." Charlottesville's real buildings float in a dark sky full of stars.
 - **The city:** 10,360 building footprints and the street centerlines, drawn as translucent green blocks. The ground is flat; real terrain was planned for later.
